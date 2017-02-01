@@ -24,5 +24,8 @@
   "scripts": {
     "start": "knex migrate:latest && node --harmony-async-await server/index.js",
     "dev": "nodemon --harmony-async-await server/index.js --watch server"
+  },
+  "engines": {
+    "node": ">=7.4.0"
   }
 }
