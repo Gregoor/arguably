@@ -9,6 +9,8 @@ const next = require('next');
 const schema = require('./graphql');
 
 
+const PORT = process.env.PORT || 3000;
+
 const start = async () => {
   const app = next({dev: process.env.NODE_ENV == 'development'});
   const nextHandle = app.getRequestHandler();
@@ -32,9 +34,9 @@ const start = async () => {
       nextHandle(req, res);
     }
   })
-    .listen(process.env.PORT || 3000, (err) => {
+    .listen(PORT, (err) => {
       if (err) throw err;
-      console.log('> Ready on http://localhost:3000');
+      console.log('> Ready on', PORT);
     });
 };
 

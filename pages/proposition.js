@@ -29,7 +29,7 @@ class PropositionPage extends Component {
 
         <p style={{textAlign: 'center'}}><Link href="/"><a>Back to all</a></Link></p>
 
-        <PropositionCard {...{proposition}} withParent/>
+        <PropositionCard {...{proposition, viewer}} withParent/>
 
         {this.state.showNewForm
           ? <PropositionCard proposition={null} parentID={id} viewer={viewer}
@@ -92,7 +92,7 @@ PropositionPage = Relay.createContainer(PropositionPage, {
 
 export default () => RelayPage(
   Relay.createContainer(
-    ({node}) => <PropositionPage proposition={node}/>,
+    ({node, viewer}) => <PropositionPage proposition={node} viewer={viewer}/>,
     {
       fragments: {
 
