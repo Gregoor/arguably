@@ -34,7 +34,7 @@ class PropositionPage extends Component {
         {this.state.showNewForm
           ? <PropositionCard proposition={null} parentID={id} viewer={viewer}
                              onCancel={this.toggleShowNewForm}/>
-          : (
+          : viewer.is_god && (
             <p style={{textAlign: 'center'}}>
               <button type="button" onClick={this.toggleShowNewForm}>Add Proposition</button>
             </p>
@@ -82,6 +82,7 @@ PropositionPage = Relay.createContainer(PropositionPage, {
 
     viewer: () => Relay.QL`
       fragment on Viewer {
+        is_god
         ${PropositionCard.getFragment('viewer')}
       }
     `
