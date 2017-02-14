@@ -119,7 +119,7 @@ class PropositionCard extends Component {
 
     return (
       <Card><form onSubmit={this.save}>
-        {id}
+
         {withParent && parent && (
           <CardTitle><PropositionLink id={parent.id} style={{opacity: .5}}>
             {parent.name}
