@@ -8,7 +8,9 @@ export default class CreateProposition extends Relay.Mutation {
   }
 
   getVariables() {
-    return {proposition: _.pick(this.props.proposition, 'name', 'text', 'parent_id', 'type')};
+    return {
+      proposition: _.pick(this.props.proposition, 'name', 'text', 'parent_id', 'type', 'source_url')
+    };
   }
 
   getFatQuery() {

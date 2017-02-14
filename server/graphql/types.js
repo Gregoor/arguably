@@ -71,9 +71,10 @@ const PropositionGQL = new GraphQLObjectType({
   name: 'Proposition',
   fields: () => ({
     id:    globalIdField(),
-    name:  {type: new GraphQLNonNull(GraphQLString)},
-    text:  {type: new GraphQLNonNull(GraphQLString)},
-    votes: {type: new GraphQLNonNull(GraphQLInt)},
+    name:       {type: new GraphQLNonNull(GraphQLString)},
+    text:       {type: new GraphQLNonNull(GraphQLString)},
+    source_url: {type: GraphQLString},
+    votes:      {type: new GraphQLNonNull(GraphQLInt)},
     children: {
       type: PropositionConnection,
       args: connectionArgs,

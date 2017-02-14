@@ -17,11 +17,12 @@ const processPropositionInput = (input) => _.omit(localizeIDs(input, 'parent_id'
 const PropositionInputGQL = new GraphQLInputObjectType({
   name: 'PropositionInput',
   fields: {
-    id:        {type: GraphQLID},
-    name:      {type: GraphQLString},
-    text:      {type: GraphQLString},
-    parent_id: {type: GraphQLID},
-    type:      {type: PropositionTypeGQL}
+    id:         {type: GraphQLID},
+    name:       {type: GraphQLString},
+    text:       {type: GraphQLString},
+    parent_id:  {type: GraphQLID},
+    type:       {type: PropositionTypeGQL},
+    source_url: {type: GraphQLString}
   }
 });
 

@@ -44,6 +44,13 @@ PropositionLink = styled(PropositionLink)`
   }
 `;
 
+const SourceSection = ({children}) => (
+  <CardSection style={{paddingTop: 0}}>
+    <b style={{marginRight: 5}}>Source:</b>
+    {children}
+  </CardSection>
+);
+
 class PropositionCard extends Component {
 
   constructor(props) {
@@ -53,6 +60,7 @@ class PropositionCard extends Component {
       name: '',
       text: '',
       type: 'PRO',
+      source_urL: '',
       ...props.proposition
     }
   }
@@ -106,12 +114,12 @@ class PropositionCard extends Component {
   render() {
     const {proposition, viewer, withParent, relay: {variables: {withStats}}} = this.props;
     const {isEditing} = proposition ? this.state : {isEditing : true};
-    const {id, childContraCount, childProCount, parent} = proposition || {};
+    const {id, childContraCount, childProCount, source_url, parent} = proposition || {};
     const {name, text, type} = isEditing ? this.state : proposition;
 
     return (
       <Card><form onSubmit={this.save}>
-
+        {id}
         {withParent && parent && (
           <CardTitle><PropositionLink id={parent.id} style={{opacity: .5}}>
             {parent.name}
@@ -145,6 +153,10 @@ class PropositionCard extends Component {
           : text && <CardSection style={{paddingTop: 0}}>{text}</CardSection>
         }
 
+        {isEditing
+          ? <SourceSection><input name="source_url" type="text" value={source_url} style={{width: '100%'}}/></SourceSection>
+          : source_url && <SourceSection><a href={source_url}>{source_url}</a></SourceSection>
+        }
 
       <StatsBar>
         <div>
@@ -155,8 +167,7 @@ class PropositionCard extends Component {
         </div>
         {viewer.is_god && (
           <div>
-            <button type="button"
-                    onClick={this.toggleIsEditing}>
+            <button type="button" onClick={this.toggleIsEditing}>
               {isEditing ? 'Cancel' : 'Edit'}
             </button>
             {isEditing && [
@@ -190,8 +201,9 @@ export default Relay.createContainer(PropositionCard, {
         childProCount:    child_count(type: PRO)    @include(if: $withStats)
         name
         text
+        source_url
         type
-        parent {
+        parent {  
           id
           name
         }

@@ -8,7 +8,11 @@ export default class UpdateProposition extends Relay.Mutation {
   }
 
   getVariables() {
-    return {proposition: _.pick(this.props.proposition, 'id', 'name', 'text', 'parent_id', 'type')};
+    return {
+      proposition: _.pick(this.props.proposition,
+        'id', 'name', 'text', 'parent_id', 'type', 'source_url'
+      )
+    };
   }
 
   getFatQuery() {
@@ -18,6 +22,7 @@ export default class UpdateProposition extends Relay.Mutation {
           name
           text
           type
+          source_url
         }
       }
     `
