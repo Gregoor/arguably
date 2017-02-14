@@ -55,13 +55,14 @@ class PropositionCard extends Component {
 
   constructor(props) {
     super(props);
+    const {proposition} = props;
     this.state = {
       isEditing: false,
       name: '',
       text: '',
       type: 'PRO',
-      source_urL: '',
-      ...props.proposition
+      ...proposition,
+      source_url: (proposition && proposition.source_url) || ''
     }
   }
 
@@ -101,9 +102,12 @@ class PropositionCard extends Component {
     event.preventDefault();
 
     const {id, parent} = this.props.proposition || {};
-    const {name, text, type} = this.state;
+    const {name, source_url, text, type} = this.state;
 
-    const proposition = {id, name, text, type, parent_id: parent ? parent.id : this.props.parentID};
+    const proposition = {
+      id, name, source_url, text, type,
+      parent_id: parent ? parent.id : this.props.parentID
+    };
     if (!proposition.parent_id) delete proposition.parent_id;
     Relay.Store.commitUpdate(
       new (id ? UpdatePropositionMutation : CreatePropositionMutation)({proposition})
@@ -114,8 +118,8 @@ class PropositionCard extends Component {
   render() {
     const {proposition, viewer, withParent, relay: {variables: {withStats}}} = this.props;
     const {isEditing} = proposition ? this.state : {isEditing : true};
-    const {id, childContraCount, childProCount, source_url, parent} = proposition || {};
-    const {name, text, type} = isEditing ? this.state : proposition;
+    const {id, childContraCount, childProCount, parent} = proposition || {};
+    const {name, source_url, text, type} = isEditing ? this.state : proposition;
 
     return (
       <Card><form onSubmit={this.save}>
@@ -154,7 +158,12 @@ class PropositionCard extends Component {
         }
 
         {isEditing
-          ? <SourceSection><input name="source_url" type="text" value={source_url} style={{width: '100%'}}/></SourceSection>
+          ? (
+            <SourceSection>
+              <input name="source_url" type="text" value={source_url}
+                     onChange={this.handleInputChange} style={{width: '100%'}}/>
+            </SourceSection>
+          )
           : source_url && <SourceSection><a href={source_url}>{source_url}</a></SourceSection>
         }
 
@@ -200,8 +209,8 @@ export default Relay.createContainer(PropositionCard, {
         childContraCount: child_count(type: CONTRA) @include(if: $withStats)
         childProCount:    child_count(type: PRO)    @include(if: $withStats)
         name
-        text
         source_url
+        text
         type
         parent {  
           id
