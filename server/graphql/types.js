@@ -51,10 +51,11 @@ const {nodeInterface, nodeField} = nodeDefinitions(
       return Proposition().where({id}).first();
     }
 
-    return null
+    return {};
   },
   (obj) => {
-    return PropositionGQL;
+    if (obj.id) return PropositionGQL;
+    else return ViewerGQL;
   }
 );
 
@@ -118,7 +119,8 @@ const ViewerGQL = new GraphQLObjectType({
         knexToConnection(Proposition.orderByChildCount().where('parent_id', null), args)
       )
     }
-  }
+  },
+  interfaces: [nodeInterface]
 });
 
 
