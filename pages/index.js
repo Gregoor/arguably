@@ -28,33 +28,49 @@ ${PropositionCard.fragments.proposition}
 ${PropositionCard.fragments.viewer}
 `;
 
+const PageContent = ({onLoadMore, viewer}) => {
+  const {root_propositions: {pageInfo, edges}} = viewer;
+  return (
+    <PageContainer>
+      <InfiniteScroll
+        hasMore={pageInfo.hasNextPage}
+        loadMore={onLoadMore}
+        loader={<div>Loading ...</div>}>
+        {edges.map(({node}) => (
+          <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
+        ))}
+      </InfiniteScroll>
+    </PageContainer>
+  );
+};
 
-export default class extends Component {
+const INITIAL_FIRST = 20;
+
+export default class IndexPage extends Component {
 
   static async getInitialProps() {
     return await apollo.query({
       query,
       variables: {
-        first: 20
+        first: INITIAL_FIRST
       }
     })
   }
 
+  state = {data: null, first: INITIAL_FIRST};
+
+  loadMore = async() => {
+    const first = this.state.first + INITIAL_FIRST;
+
+    this.setState({
+      first,
+      ...await apollo.query({query, variables: {first}})
+    });
+  };
+
   render() {
-    const {data: {viewer}} = this.props;
-    const {root_propositions: {pageInfo, edges}} = viewer;
-    return (
-      <PageContainer>
-        <InfiniteScroll
-          hasMore={pageInfo.hasNextPage}
-          loadMore={() => true || relay.setVariables({first: relay.variables.first + 10})}
-          loader={<div>Loading ...</div>}>
-          {edges.map(({node}) => (
-            <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
-          ))}
-        </InfiniteScroll>
-      </PageContainer>
-    );
+    console.log(this.state.data)
+    return <PageContent {...this.props.data} {...this.state.data} onLoadMore={this.loadMore} />
   }
 
 };
