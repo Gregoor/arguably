@@ -26,7 +26,8 @@
     "nodemon": "^1.11.0"
   },
   "scripts": {
-    "heroku-postbuild": "heroku-nextjs-build",
+    "build": "next build",
+    "heroku-postbuild": "node server/index.js & heroku-nextjs-build",
     "prestart": "knex migrate:latest",
     "start": "node server/index.js",
     "dev": "nodemon --watch server"
