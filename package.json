@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@mars/heroku-nextjs-build": "^1.1.0",
     "apollo-client": "^0.8.7",
     "dotenv": "^4.0.0",
     "express-graphql": "^0.6.2",
@@ -13,23 +14,27 @@
     "isomorphic-fetch": "^2.2.1",
     "knex": "^0.12.6",
     "lodash": "^4.17.4",
-    "next": "2.0.0-beta.25",
+    "next": "2.0.0-beta.32",
     "pg": "^6.1.2",
     "react": "^15.4.1",
     "react-apollo": "^0.11.2",
     "react-dom": "^15.4.1",
     "react-infinite-scroller": "^1.0.4",
-    "styled-components": "^1.2.1"
+    "styled-components": "^1.4.3"
   },
   "devDependencies": {
     "nodemon": "^1.11.0"
   },
   "scripts": {
+    "heroku-postbuild": "heroku-nextjs-build",
     "prestart": "knex migrate:latest",
     "start": "node server/index.js",
     "dev": "nodemon --watch server"
   },
   "engines": {
-    "node": ">=7.4.0"
-  }
+    "node": "7.6.0"
+  },
+  "cacheDirectories": [
+    "nextjs/node_modules"
+  ]
 }
