@@ -1,42 +1,60 @@
-import React from 'react';
+import gql from 'graphql-tag';
+import React, {Component} from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
-import Relay from 'react-relay';
 
-import PropositionCard from '../components/proposition-card';
-import RelayPage from '../components/relay-page';
+import apollo from '../apollo'
+import PropositionCard from '../components/proposition-card/index';
+import {PageContainer} from '../components/ui';
 
 
-export default () => RelayPage(Relay.createContainer(
-  ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => (
-    <InfiniteScroll
-      hasMore={pageInfo.hasNextPage}
-      loadMore={() => relay.setVariables({first: relay.variables.first + 10})}
-      loader={<div>Loading ...</div>}>
-      {edges.map(({node}) => (
-        <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
-      ))}
-    </InfiniteScroll>
-  ),
-  {
-
-    initialVariables: {first: 20},
-
-    fragments: {viewer: () => Relay.QL`    
-      fragment on Viewer {
-        root_propositions(first: $first) {
-          pageInfo {
-            hasNextPage
-          }
-          edges {
-            node {
-              id
-              ${PropositionCard.getFragment('proposition', {withStats: true})}
-            }
-          }
-        }
-        ${PropositionCard.getFragment('viewer', {withStats: true})}
+const query = gql`
+query($first: Int!) {
+  viewer {
+    root_propositions(first: $first) {
+      pageInfo {
+        hasNextPage
       }
-    `}
-
+      edges {
+        node {
+          id
+          ...propositionCardProposition
+        }
+      }
+    }
+    ...propositionCardViewer
   }
-));
+}
+${PropositionCard.fragments.proposition}
+${PropositionCard.fragments.viewer}
+`;
+
+
+export default class extends Component {
+
+  static async getInitialProps() {
+    return await apollo.query({
+      query,
+      variables: {
+        first: 20
+      }
+    })
+  }
+
+  render() {
+    const {data: {viewer}} = this.props;
+    const {root_propositions: {pageInfo, edges}} = viewer;
+    return (
+      <PageContainer>
+        <InfiniteScroll
+          hasMore={pageInfo.hasNextPage}
+          loadMore={() => true || relay.setVariables({first: relay.variables.first + 10})}
+          loader={<div>Loading ...</div>}>
+          {edges.map(({node}) => (
+            <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
+          ))}
+        </InfiniteScroll>
+      </PageContainer>
+    );
+  }
+
+};

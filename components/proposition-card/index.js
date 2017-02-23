@@ -1,48 +1,13 @@
-import React, {Component} from 'react';
-import Relay from 'react-relay';
+import {propType} from 'graphql-anywhere'
+import gql from 'graphql-tag';
 import _ from 'lodash';
-import Router from 'next/router';
-import styled from 'styled-components';
+import React, {Component} from 'react';
 
-import DeletePropositionMutation from '../mutations/delete-proposition';
-import CreatePropositionMutation from '../mutations/create-proposition';
-import UpdatePropositionMutation from '../mutations/update-proposition';
-import {Card, CardSection, CardTitle} from './ui';
-
-const TypeTagBar = styled(CardSection)`
-  padding-bottom: 0;
-`;
-
-const StatsBar = styled(CardSection)`
-  display: flex;
-  justify-content: space-between;
-  padding-top: 0;
-`;
-
-const typeColors = {
-  PRO: '#81C784',
-  CONTRA: '#FF8A80'
-};
-
-const TypeTag = styled.span`
-  margin-right: 16px;
-  padding-bottom: 0;
-  font-weight: bold;
-  color: ${(props) => typeColors[props.type] || '#aab8c2'};
-`;
-
-let PropositionLink = ({children, id, ...props}) => (
-  <div onClick={() => Router.push(`/proposition?id=${id}`)} {...props}>
-    {children}
-  </div>
-);
-
-PropositionLink = styled(PropositionLink)`
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-`;
+// import DeletePropositionMutation from '../mutations/delete-proposition';
+// import CreatePropositionMutation from '../mutations/create-proposition';
+// import UpdatePropositionMutation from '../mutations/update-proposition';
+import {Card, CardSection, CardTitle} from '../ui';
+import {PropositionLink, StatsBar, TypeTag, TypeTagBar} from './components';
 
 const SourceSection = ({children}) => (
   <CardSection style={{paddingTop: 0}}>
@@ -51,7 +16,40 @@ const SourceSection = ({children}) => (
   </CardSection>
 );
 
-class PropositionCard extends Component {
+
+export default class PropositionCard extends Component {
+
+  static fragments = {
+    proposition: gql`
+      fragment propositionCardProposition on Proposition {
+        id
+        childContraCount: child_count(type: CONTRA)
+        childProCount:    child_count(type: PRO)
+        name
+        source_url
+        text
+        type
+        parent {
+          id
+          name
+        }
+      }
+    `,
+    viewer: gql`
+      fragment propositionCardViewer on Viewer {
+        is_god
+      }
+    `
+  };
+
+  static propTypes = {
+    proposition: propType(PropositionCard.fragments.proposition).isRequired,
+    viewer: propType(PropositionCard.fragments.viewer).isRequired
+  };
+
+  static defaultProps = {
+    onCancel: _.noop
+  };
 
   constructor(props) {
     super(props);
@@ -116,7 +114,7 @@ class PropositionCard extends Component {
   };
 
   render() {
-    const {proposition, viewer, withParent, relay: {variables: {withStats}}} = this.props;
+    const {proposition, viewer, withParent, withStats} = this.props;
     const {isEditing} = proposition ? this.state : {isEditing : true};
     const {id, childContraCount, childProCount, parent} = proposition || {};
     const {name, source_url, text, type} = isEditing ? this.state : proposition;
@@ -167,64 +165,28 @@ class PropositionCard extends Component {
           : source_url && <SourceSection><a href={source_url}>{source_url}</a></SourceSection>
         }
 
-      <StatsBar>
-        <div>
-          {withStats && [
-            <TypeTag key="pro" type="PRO">✔ {childProCount}</TypeTag>,
-            <TypeTag key="contra" type="CONTRA">✖ {childContraCount}</TypeTag>
-          ]}
-        </div>
-        {viewer.is_god && (
+        <StatsBar>
           <div>
-            <button type="button" onClick={this.toggleIsEditing}>
-              {isEditing ? 'Cancel' : 'Edit'}
-            </button>
-            {isEditing && [
-              proposition && <button key="delete" type="button" onClick={this.del}>Delete</button>,
-              <button key="save" type="submit">{proposition ? 'Save' : 'Create'}</button>
+            {withStats && [
+              <TypeTag key="pro" type="PRO">✔ {childProCount}</TypeTag>,
+              <TypeTag key="contra" type="CONTRA">✖ {childContraCount}</TypeTag>
             ]}
           </div>
-        )}
-      </StatsBar>
+          {viewer.is_god && (
+            <div>
+              <button type="button" onClick={this.toggleIsEditing}>
+                {isEditing ? 'Cancel' : 'Edit'}
+              </button>
+              {isEditing && [
+                proposition && <button key="delete" type="button" onClick={this.del}>Delete</button>,
+                <button key="save" type="submit">{proposition ? 'Save' : 'Create'}</button>
+              ]}
+            </div>
+          )}
+        </StatsBar>
 
       </form></Card>
     );
   }
 
 }
-
-PropositionCard.defaultProps = {
-  onCancel: _.noop
-};
-
-export default Relay.createContainer(PropositionCard, {
-
-  initialVariables: {withStats: false},
-
-  fragments: {
-
-    proposition: () => Relay.QL`
-      fragment on Proposition {
-        id
-        childContraCount: child_count(type: CONTRA) @include(if: $withStats)
-        childProCount:    child_count(type: PRO)    @include(if: $withStats)
-        name
-        source_url
-        text
-        type
-        parent {  
-          id
-          name
-        }
-      }
-    `,
-
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        is_god
-      }
-    `
-
-  }
-
-});
