@@ -1,53 +1,13 @@
-import gql from 'graphql-tag';
-import Link from 'next/link';
 import React, {Component} from 'react';
+import Relay from 'react-relay';
+import Link from 'next/link';
 import InfiniteScroll from 'react-infinite-scroller';
 
-import apollo from '../apollo'
 import PropositionCard from '../components/proposition-card';
-import {PageContainer} from '../components/ui';
+import RelayPage from '../components/relay-page';
 
 
-const query = gql`
-  query($id: ID!, $first: Int!) {
-    viewer {
-      is_god
-      ...propositionCardViewer
-    }
-    node(id: $id) {
-      ...proposition
-    }
-  }
-  fragment proposition on Proposition {
-    id
-    ...propositionCardProposition
-    children(first: $first) {
-      pageInfo {
-        hasNextPage
-      }
-      edges {
-        node {
-          id
-          ...propositionCardProposition
-        }
-      }
-    }
-  }
-  ${PropositionCard.fragments.proposition}
-  ${PropositionCard.fragments.viewer}
-`;
-
-export default class PropositionPage extends Component {
-
-  static async getInitialProps({query: {id}}) {
-    return await apollo.query({
-      query,
-      variables: {
-        id,
-        first: 20
-      }
-    })
-  }
+class PropositionPage extends Component {
 
   state = {
     showNewForm: false
@@ -63,10 +23,9 @@ export default class PropositionPage extends Component {
   };
 
   render() {
-    const {data: {node: proposition, viewer}} = this.props;
-    const {id, children} = proposition;
+    const {proposition: {id, children, ...proposition}, viewer} = this.props;
     return (
-      <PageContainer>
+      <div>
 
         <p style={{textAlign: 'center'}}><Link href="/"><a>Back to all</a></Link></p>
 
@@ -91,10 +50,70 @@ export default class PropositionPage extends Component {
           ))}
         </InfiniteScroll>
 
-      </PageContainer>
+      </div>
     );
   }
 
 }
+
+PropositionPage = Relay.createContainer(PropositionPage, {
+
+  initialVariables: {first: 20},
+
+  fragments: {
+
+    proposition: () => Relay.QL`
+      fragment on Proposition {
+        id
+        ${PropositionCard.getFragment('proposition')}
+        children(first: $first) {
+          pageInfo {
+            hasNextPage
+          }
+          edges {
+            node {
+              id
+              ${PropositionCard.getFragment('proposition', {withStats: true})}
+            }
+          }
+        }
+      }
+    `,
+
+    viewer: () => Relay.QL`
+      fragment on Viewer {
+        is_god
+        ${PropositionCard.getFragment('viewer')}
+      }
+    `
+
+  }
+
+});
+
+export default () => RelayPage(
+  Relay.createContainer(
+    ({node, viewer}) => <PropositionPage proposition={node} viewer={viewer}/>,
+    {
+      fragments: {
+
+        node: () => Relay.QL`
+          fragment on Node {
+            ${PropositionPage.getFragment('proposition')}
+          }
+        `,
+
+        viewer: () => Relay.QL`
+          fragment on Viewer {
+            ${PropositionPage.getFragment('viewer')}
+          }
+        `
+
+      }
+    }
+  ),
+  ['node', 'viewer']
+);
+
 
 

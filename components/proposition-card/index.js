@@ -1,11 +1,10 @@
-import {propType} from 'graphql-anywhere'
-import gql from 'graphql-tag';
 import _ from 'lodash';
 import React, {Component} from 'react';
+import Relay from 'react-relay';
 
-// import DeletePropositionMutation from '../mutations/delete-proposition';
-// import CreatePropositionMutation from '../mutations/create-proposition';
-// import UpdatePropositionMutation from '../mutations/update-proposition';
+import DeletePropositionMutation from '../../mutations/delete-proposition';
+import CreatePropositionMutation from '../../mutations/create-proposition';
+import UpdatePropositionMutation from '../../mutations/update-proposition';
 import {Card, CardSection, CardTitle} from '../ui';
 import {PropositionLink, StatsBar, TypeTag, TypeTagBar} from './components';
 
@@ -17,39 +16,7 @@ const SourceSection = ({children}) => (
 );
 
 
-export default class PropositionCard extends Component {
-
-  static fragments = {
-    proposition: gql`
-      fragment propositionCardProposition on Proposition {
-        id
-        childContraCount: child_count(type: CONTRA)
-        childProCount:    child_count(type: PRO)
-        name
-        source_url
-        text
-        type
-        parent {
-          id
-          name
-        }
-      }
-    `,
-    viewer: gql`
-      fragment propositionCardViewer on Viewer {
-        is_god
-      }
-    `
-  };
-
-  static propTypes = {
-    proposition: propType(PropositionCard.fragments.proposition).isRequired,
-    viewer: propType(PropositionCard.fragments.viewer).isRequired
-  };
-
-  static defaultProps = {
-    onCancel: _.noop
-  };
+class PropositionCard extends Component {
 
   constructor(props) {
     super(props);
@@ -114,7 +81,7 @@ export default class PropositionCard extends Component {
   };
 
   render() {
-    const {proposition, viewer, withParent, withStats} = this.props;
+    const {proposition, viewer, withParent, relay: {variables: {withStats}}} = this.props;
     const {isEditing} = proposition ? this.state : {isEditing : true};
     const {id, childContraCount, childProCount, parent} = proposition || {};
     const {name, source_url, text, type} = isEditing ? this.state : proposition;
@@ -190,3 +157,39 @@ export default class PropositionCard extends Component {
   }
 
 }
+
+PropositionCard.defaultProps = {
+  onCancel: _.noop
+};
+
+export default Relay.createContainer(PropositionCard, {
+
+  initialVariables: {withStats: false},
+
+  fragments: {
+
+    proposition: () => Relay.QL`
+      fragment on Proposition {
+        id
+        childContraCount: child_count(type: CONTRA) @include(if: $withStats)
+        childProCount:    child_count(type: PRO)    @include(if: $withStats)
+        name
+        source_url
+        text
+        type
+        parent {
+          id
+          name
+        }
+      }
+    `,
+
+    viewer: () => Relay.QL`
+      fragment on Viewer {
+        is_god
+      }
+    `
+
+  }
+
+});
