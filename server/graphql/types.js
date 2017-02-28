@@ -3,14 +3,14 @@ const {
   GraphQLString
 } = require('graphql');
 const {
-  connectionArgs, connectionDefinitions, fromGlobalId, globalIdField, nodeDefinitions, toGlobalId
+  connectionArgs, connectionDefinitions, fromGlobalId, globalIdField, nodeDefinitions
 } = require('graphql-relay');
 const _ = require('lodash');
 
-const {isAuthorized} = require('./helpers');
-const {Proposition} = require('../models');
+const {Proposition, User} = require('../models');
 
-const knexToConnection = async (baseQuery, {first, after, last, before}) => {
+
+const knexToConnection = async(baseQuery, {first, after, last, before}) => {
   let query = baseQuery.clone();
 
   const offset = parseInt(after, 10) || 0;
@@ -59,10 +59,20 @@ const {nodeInterface, nodeField} = nodeDefinitions(
   }
 );
 
+const UserGQL = new GraphQLObjectType({
+  name: 'User',
+  fields: {
+    id: globalIdField(),
+    name: {type: new GraphQLNonNull(GraphQLString)},
+    can_vote: {type: new GraphQLNonNull(GraphQLBoolean)},
+    can_publish: {type: new GraphQLNonNull(GraphQLBoolean)}
+  }
+});
+
 const PropositionTypeGQL = new GraphQLEnumType({
   name: 'PropositionType',
   values: {
-    PRO:    {value: 'pro'},
+    PRO: {value: 'pro'},
     CONTRA: {value: 'contra'}
   }
 });
@@ -70,11 +80,11 @@ const PropositionTypeGQL = new GraphQLEnumType({
 const PropositionGQL = new GraphQLObjectType({
   name: 'Proposition',
   fields: () => ({
-    id:    globalIdField(),
-    name:       {type: new GraphQLNonNull(GraphQLString)},
-    text:       {type: new GraphQLNonNull(GraphQLString)},
+    id: globalIdField(),
+    name: {type: new GraphQLNonNull(GraphQLString)},
+    text: {type: new GraphQLNonNull(GraphQLString)},
     source_url: {type: GraphQLString},
-    votes:      {type: new GraphQLNonNull(GraphQLInt)},
+    votes: {type: new GraphQLNonNull(GraphQLInt)},
     children: {
       type: PropositionConnection,
       args: connectionArgs,
@@ -87,11 +97,11 @@ const PropositionGQL = new GraphQLObjectType({
       args: {
         type: {type: PropositionTypeGQL}
       },
-      resolve: async ({id, child_count}, args) => (!args.type && child_count) || (
+      resolve: async({id, child_count}, args) => (!args.type && child_count) || (
         (await Proposition(Object.assign({parent_id: id}, _.pick(args, 'type'))).count().first()).count
       )
     },
-    type:  {type: PropositionTypeGQL},
+    type: {type: PropositionTypeGQL},
     parent: {
       type: PropositionGQL,
       resolve: ({parent_id}) => parent_id ? Proposition({id: parent_id}).first() : null
@@ -109,9 +119,11 @@ const ViewerGQL = new GraphQLObjectType({
   name: 'Viewer',
   fields: {
     id: {type: new GraphQLNonNull(GraphQLID), resolve: () => 'viewer'},
-    is_god: {
-      type: new GraphQLNonNull(GraphQLBoolean),
-      resolve: (viewer, args, req) => isAuthorized(req)
+    user: {
+      type: UserGQL,
+      resolve: (viewer, {}, {user_id}) => (
+        viewer.user || (user_id && User().where('id', user_id).first())
+      )
     },
     root_propositions: {
       type: PropositionConnection,

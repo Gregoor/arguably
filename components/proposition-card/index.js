@@ -5,16 +5,15 @@ import Relay from 'react-relay';
 import DeletePropositionMutation from '../../mutations/delete-proposition';
 import CreatePropositionMutation from '../../mutations/create-proposition';
 import UpdatePropositionMutation from '../../mutations/update-proposition';
-import {Card, CardSection, CardTitle} from '../ui';
+import {Card, CardSection, CardTitle, FullWidthInput, typeColors} from '../ui';
 import {PropositionLink, StatsBar, TypeTag, TypeTagBar} from './components';
 
 const SourceSection = ({children}) => (
-  <CardSection style={{paddingTop: 0}}>
+  <CardSection>
     <b style={{marginRight: 5}}>Source:</b>
     {children}
   </CardSection>
 );
-
 
 class PropositionCard extends Component {
 
@@ -81,7 +80,7 @@ class PropositionCard extends Component {
   };
 
   render() {
-    const {proposition, viewer, withParent, relay: {variables: {withStats}}} = this.props;
+    const {proposition, viewer, withParent, withStats} = this.props;
     const {isEditing} = proposition ? this.state : {isEditing : true};
     const {id, childContraCount, childProCount, parent} = proposition || {};
     const {name, source_url, text, type} = isEditing ? this.state : proposition;
@@ -106,27 +105,27 @@ class PropositionCard extends Component {
 
         <CardTitle>
           {isEditing
-            ? <input type="text" name="name" value={name} style={{width: '100%'}}
-                     onChange={this.handleInputChange}/>
+            ? <FullWidthInput type="text" name="name" value={name}
+                              onChange={this.handleInputChange}/>
             : <PropositionLink id={id}>{name}</PropositionLink>
           }
         </CardTitle>
 
         {isEditing
           ? (
-            <CardSection style={{paddingTop: 0}}>
+            <CardSection>
               <textarea name="text" value={text} style={{width: '100%'}}
                         onChange={this.handleInputChange}/>
             </CardSection>
           )
-          : text && <CardSection style={{paddingTop: 0}}>{text}</CardSection>
+          : text && <CardSection>{text}</CardSection>
         }
 
         {isEditing
           ? (
             <SourceSection>
-              <input name="source_url" type="text" value={source_url}
-                     onChange={this.handleInputChange} style={{width: '100%'}}/>
+              <FullWidthInput name="source_url" type="text" value={source_url}
+                              onChange={this.handleInputChange}/>
             </SourceSection>
           )
           : source_url && <SourceSection><a href={source_url}>{source_url}</a></SourceSection>
@@ -139,7 +138,7 @@ class PropositionCard extends Component {
               <TypeTag key="contra" type="CONTRA">✖ {childContraCount}</TypeTag>
             ]}
           </div>
-          {viewer.is_god && (
+          {viewer.user && viewer.user.can_publish && (
             <div>
               <button type="button" onClick={this.toggleIsEditing}>
                 {isEditing ? 'Cancel' : 'Edit'}
@@ -164,15 +163,13 @@ PropositionCard.defaultProps = {
 
 export default Relay.createContainer(PropositionCard, {
 
-  initialVariables: {withStats: false},
-
   fragments: {
 
     proposition: () => Relay.QL`
       fragment on Proposition {
         id
-        childContraCount: child_count(type: CONTRA) @include(if: $withStats)
-        childProCount:    child_count(type: PRO)    @include(if: $withStats)
+        childContraCount: child_count(type: CONTRA)
+        childProCount:    child_count(type: PRO)
         name
         source_url
         text
@@ -186,7 +183,10 @@ export default Relay.createContainer(PropositionCard, {
 
     viewer: () => Relay.QL`
       fragment on Viewer {
-        is_god
+        user {
+          can_vote
+          can_publish
+        }
       }
     `
 

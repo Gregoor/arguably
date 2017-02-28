@@ -2,7 +2,7 @@ import Router from 'next/router';
 import React, {Component} from 'react';
 import styled from 'styled-components';
 
-import {CardSection} from '../ui';
+import {CardSection, typeColors} from '../ui';
 
 export const PropositionLink = styled(
   ({children, id, ...props}) => (
@@ -22,11 +22,6 @@ export const StatsBar = styled(CardSection)`
   justify-content: space-between;
   padding-top: 0;
 `;
-
-export const typeColors = {
-  PRO: '#81C784',
-  CONTRA: '#FF8A80'
-};
 
 export const TypeTag = styled.span`
   margin-right: 16px;

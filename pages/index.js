@@ -1,13 +1,13 @@
 import React from 'react';
 import DocumentTitle from 'react-document-title';
-import Relay from 'react-relay';
 import InfiniteScroll from 'react-infinite-scroller';
+import Relay from 'react-relay';
 
 import PropositionCard from '../components/proposition-card';
-import RelayPage from '../components/relay-page';
+import Layout from '../components/layout';
 
 
-export default () => RelayPage(Relay.createContainer(
+export default () => Layout(Relay.createContainer(
   ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => (
     <DocumentTitle title="Arguably">
       <InfiniteScroll
@@ -33,11 +33,11 @@ export default () => RelayPage(Relay.createContainer(
           edges {
             node {
               id
-              ${PropositionCard.getFragment('proposition', {withStats: true})}
+              ${PropositionCard.getFragment('proposition')}
             }
           }
         }
-        ${PropositionCard.getFragment('viewer', {withStats: true})}
+        ${PropositionCard.getFragment('viewer')}
       }
     `}
 

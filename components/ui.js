@@ -27,6 +27,7 @@ export const Card = styled.div`
   box-sizing: border-box;
   border-radius: 2px;
   margin: 0 0 16px 4px;
+  padding-bottom: 8px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -38,7 +39,7 @@ export const Card = styled.div`
 
 export const CardSection = styled.div`
   margin: 0;
-  padding: 16px;
+  padding: 8px 16px;
   line-height: 18px;
   overflow: hidden;
   color: rgba(0, 0, 0, .8);
@@ -58,6 +59,22 @@ export const CardTitle = styled.h3`
   box-sizing: border-box;
   text-decoration: none;
 `;
+
+export const FullWidthInput = styled.input`
+  width: 100%;
+`;
+
+export const Input = ({input, label, type, meta: {touched, error, warning}}) => (
+  <div>
+    <FullWidthInput {...input} type={type} placeholder={label}/>
+    {touched && error && <div style={{color: typeColors.CONTRA}}>{error}</div>}
+  </div>
+);
+
+export const typeColors = {
+  PRO: '#81C784',
+  CONTRA: '#FF8A80'
+};
 
 export const PageContainer = styled.div`
   margin: 0 auto;

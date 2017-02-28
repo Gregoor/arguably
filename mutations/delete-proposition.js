@@ -13,7 +13,7 @@ export default class UpdateProposition extends Relay.Mutation {
 
   getFatQuery() {
     return Relay.QL`
-      fragment on DeletePropositionePayload {
+      fragment on DeletePropositionPayload {
         id
         parent_proposition {
           children

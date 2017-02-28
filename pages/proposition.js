@@ -1,22 +1,13 @@
-import Link from 'next/link';
 import React, {Component} from 'react';
 import DocumentTitle from 'react-document-title';
 import Relay from 'react-relay';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import PropositionCard from '../components/proposition-card';
-import RelayPage from '../components/relay-page';
+import Layout from '../components/layout';
 
 
 class PropositionPage extends Component {
-
-  state = {
-    showNewForm: false
-  };
-
-  toggleShowNewForm = () => {
-    this.setState((state) => ({showNewForm: !state.showNewForm}));
-  };
 
   loadMore = () => {
     const {relay} = this.props;
@@ -28,19 +19,11 @@ class PropositionPage extends Component {
     return (
       <DocumentTitle title={name + ' - Arguably'}><div>
 
-        <p style={{textAlign: 'center'}}><Link href="/"><a>Back to all</a></Link></p>
-
         <PropositionCard {...{proposition, viewer}} withParent/>
 
-        {this.state.showNewForm
-          ? <PropositionCard proposition={null} parentID={id} viewer={viewer}
-                             onCancel={this.toggleShowNewForm}/>
-          : viewer.is_god && (
-            <p style={{textAlign: 'center'}}>
-              <button type="button" onClick={this.toggleShowNewForm}>Add Proposition</button>
-            </p>
-          )
-        }
+        {viewer.user && viewer.user.can_publish && (
+          <PropositionCard proposition={null} parentID={id} viewer={viewer}/>
+        )}
 
         <InfiniteScroll
           hasMore={children.pageInfo.hasNextPage}
@@ -75,7 +58,7 @@ PropositionPage = Relay.createContainer(PropositionPage, {
           edges {
             node {
               id
-              ${PropositionCard.getFragment('proposition', {withStats: true})}
+              ${PropositionCard.getFragment('proposition')}
             }
           }
         }
@@ -84,7 +67,9 @@ PropositionPage = Relay.createContainer(PropositionPage, {
 
     viewer: () => Relay.QL`
       fragment on Viewer {
-        is_god
+        user {
+          can_publish
+        }
         ${PropositionCard.getFragment('viewer')}
       }
     `
@@ -93,7 +78,7 @@ PropositionPage = Relay.createContainer(PropositionPage, {
 
 });
 
-export default () => RelayPage(
+export default () => Layout(
   Relay.createContainer(
     ({node, viewer}) => <PropositionPage proposition={node} viewer={viewer}/>,
     {

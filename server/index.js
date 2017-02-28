@@ -7,6 +7,7 @@ const _ = require('lodash');
 const next = require('next');
 
 const schema = require('./graphql');
+const {JSONError, jwt} = require('./helpers');
 
 
 const PORT = process.env.PORT || 3000;
@@ -22,14 +23,7 @@ const start = async () => {
     res.setHeader('Access-Control-Allow-Headers', req.headers.host);
 
     if (['GET', 'POST'].includes(req.method) && pathname === '/graphql') {
-      graphqlHTTP({
-        schema,
-        graphiql: true,
-        formatError: (error) => console.error(error) || (DEV_MODE
-          ? _.pick(error, 'message', 'locations', 'stack')
-          : {message: 'No can do'}
-        )
-      })(req,  res);
+      handleGraphQL(req, res);
     } else {
       nextHandle(req, res);
     }
@@ -38,6 +32,42 @@ const start = async () => {
       if (err) throw err;
       console.log('> Ready on', PORT);
     });
+};
+
+const handleGraphQL = (req, res) => {
+  const authorization = req.headers['authorization'];
+  if (authorization) {
+    const [authType, token] = authorization.split(' ');
+    if (authType == 'Bearer') {
+      try {
+        req.user_id = jwt.safeDecode(token).user_id;
+      } catch (e) {
+        const [messageStart, ...messageRest] = e.message.split(' ');
+        throw JSONError({jwt: [messageStart == 'jwt' ? messageRest.join(' ') : e.message]});
+      }
+    }
+  }
+  graphqlHTTP({
+    schema,
+    graphiql: process.env.NODE_ENV != 'production',
+    formatError: (error) => {
+      try {
+        return {
+          message: JSON.parse(error.message) && error.message,
+          locations: error.locations
+        };
+      } catch (e) {
+        console.error(error);
+        return process.env.NODE_ENV == 'development'
+          ? {
+            message: error.message,
+            locations: error.locations,
+            stack: error.stack
+          }
+          : {message: 'no can do'};
+      }
+    }
+  })(req, res);
 };
 
 start().catch((e) => {

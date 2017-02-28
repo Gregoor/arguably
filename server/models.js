@@ -46,4 +46,6 @@ Proposition = ER.createRelations(Proposition, {
   parent: [BELONGS_TO, Proposition]
 });
 
-module.exports = {Proposition};
+const User = ER.createEntity('users');
+
+module.exports = {Proposition, User};
