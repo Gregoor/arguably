@@ -1,6 +1,7 @@
-import React, {Component} from 'react';
-import Relay from 'react-relay';
 import Link from 'next/link';
+import React, {Component} from 'react';
+import DocumentTitle from 'react-document-title';
+import Relay from 'react-relay';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import PropositionCard from '../components/proposition-card';
@@ -23,9 +24,9 @@ class PropositionPage extends Component {
   };
 
   render() {
-    const {proposition: {id, children, ...proposition}, viewer} = this.props;
+    const {proposition: {id, name, children, ...proposition}, viewer} = this.props;
     return (
-      <div>
+      <DocumentTitle title={name + ' - Arguably'}><div>
 
         <p style={{textAlign: 'center'}}><Link href="/"><a>Back to all</a></Link></p>
 
@@ -50,7 +51,7 @@ class PropositionPage extends Component {
           ))}
         </InfiniteScroll>
 
-      </div>
+      </div></DocumentTitle>
     );
   }
 
@@ -65,6 +66,7 @@ PropositionPage = Relay.createContainer(PropositionPage, {
     proposition: () => Relay.QL`
       fragment on Proposition {
         id
+        name
         ${PropositionCard.getFragment('proposition')}
         children(first: $first) {
           pageInfo {

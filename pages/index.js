@@ -1,6 +1,7 @@
 import React from 'react';
-import InfiniteScroll from 'react-infinite-scroller';
+import DocumentTitle from 'react-document-title';
 import Relay from 'react-relay';
+import InfiniteScroll from 'react-infinite-scroller';
 
 import PropositionCard from '../components/proposition-card';
 import RelayPage from '../components/relay-page';
@@ -8,14 +9,16 @@ import RelayPage from '../components/relay-page';
 
 export default () => RelayPage(Relay.createContainer(
   ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => (
-    <InfiniteScroll
-      hasMore={pageInfo.hasNextPage}
-      loadMore={() => relay.setVariables({first: relay.variables.first + 10})}
-      loader={<div>Loading ...</div>}>
-      {edges.map(({node}) => (
-        <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
-      ))}
-    </InfiniteScroll>
+    <DocumentTitle title="Arguably">
+      <InfiniteScroll
+        hasMore={pageInfo.hasNextPage}
+        loadMore={() => relay.setVariables({first: relay.variables.first + 10})}
+        loader={<div>Loading ...</div>}>
+        {edges.map(({node}) => (
+          <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
+        ))}
+      </InfiniteScroll>
+    </DocumentTitle>
   ),
   {
 
