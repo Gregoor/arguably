@@ -33,7 +33,7 @@
     "nodemon": "^1.11.0"
   },
   "scripts": {
-    "build": "next build",
+    "build": "node server/index.js & next build",
     "heroku-postbuild": "node server/index.js & heroku-nextjs-build",
     "prestart": "knex migrate:latest",
     "start": "node server/index.js",
