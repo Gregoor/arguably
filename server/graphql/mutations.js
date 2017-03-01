@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt-nodejs');
+const bcrypt = require('bcrypt');
 const {
   GraphQLBoolean,
   GraphQLID,
@@ -134,8 +134,8 @@ module.exports = {
       if (password.length < 8) {
         throw JSONError({password: ['too_short']});
       }
-      name = name.trim();
-      if (await User().where({name}).first()) {
+      name = name.trim().toLowerCase();
+      if (await User.firstByName(name)) {
         throw JSONError({name: ['exists']});
       }
       const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -160,7 +160,7 @@ module.exports = {
       viewer: {type: new GraphQLNonNull(ViewerGQL)}
     },
     mutateAndGetPayload: async({name, password}) => {
-      const user = await User().where({name: name.trim()}).first();
+      const user = await User.firstByName(name);
       if (!user) {
         throw JSONError({name: ['not_found']});
       }

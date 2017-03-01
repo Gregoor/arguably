@@ -46,6 +46,10 @@ Proposition = ER.createRelations(Proposition, {
   parent: [BELONGS_TO, Proposition]
 });
 
-const User = ER.createEntity('users');
+const User = ER.createEntity('users', {
+  firstByName: (name) => (
+    knex('users').where(knex.raw('lower(name)'), name.trim().toLowerCase()).first()
+  )
+});
 
 module.exports = {Proposition, User};
