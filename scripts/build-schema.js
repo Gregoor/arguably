@@ -9,7 +9,7 @@ const schema = require('../server/graphql');
 
 const schemaPath = path.join(__dirname, '..', 'data');
 
-if (!fs.statSync(schemaPath)) fs.mkdirSync(schemaPath);
+if (!fs.existsSync(schemaPath)) fs.mkdirSync(schemaPath);
 
 const schemaFilePath = path.join(schemaPath, 'schema');
 
