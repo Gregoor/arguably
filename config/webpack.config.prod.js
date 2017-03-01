@@ -1,11 +1,12 @@
+const url = require('url');
+
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const webpack = require('webpack');
-const ManifestPlugin = require('webpack-manifest-plugin');
 
-let url = require('url');
+const ManifestPlugin = require('webpack-manifest-plugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 

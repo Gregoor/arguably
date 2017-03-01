@@ -16,7 +16,6 @@ const clearConsole = require('react-dev-utils/clearConsole');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const getProcessForPort = require('react-dev-utils/getProcessForPort');
-const openBrowser = require('react-dev-utils/openBrowser');
 const prompt = require('react-dev-utils/prompt');
 const fs = require('fs');
 const config = require('../config/webpack.config.dev');
@@ -77,9 +76,6 @@ function setupCompiler(host, port, protocol) {
       console.log('The app is running at:');
       console.log();
       console.log('  ' + chalk.cyan(protocol + '://' + host + ':' + port + '/'));
-      console.log();
-      console.log('Note that the development build is not optimized.');
-      console.log('To create a production build, use ' + chalk.cyan(cli + ' run build') + '.');
       console.log();
       isFirstCompile = false;
     }
@@ -262,8 +258,6 @@ function runDevServer(host, port, protocol) {
     }
     console.log(chalk.cyan('Starting the development server...'));
     console.log();
-
-    openBrowser(protocol + '://' + host + ':' + port + '/');
   });
 }
 
