@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bcrypt": "^1.0.2",
+    "bcrypt-nodejs": "^0.0.3",
     "connect": "^3.6.0",
     "connect-gzip": "^0.1.6",
     "cors": "^2.8.1",
