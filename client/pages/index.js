@@ -7,7 +7,7 @@ import PropositionCard from '../components/proposition-card';
 
 
 export default Relay.createContainer(
-  ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => console.log(relay) || (
+  ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => (
     <DocumentTitle title="Arguably">
       <InfiniteScroll
         hasMore={pageInfo.hasNextPage}
