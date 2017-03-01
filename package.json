@@ -39,8 +39,8 @@
     "babel-eslint": "7.1.1",
     "babel-jest": "18.0.0",
     "babel-loader": "6.2.10",
-    "babel-plugin-react-relay": "^0.9.3-3",
     "babel-preset-react-app": "^2.1.1",
+    "babel-relay-plugin": "^0.11.0",
     "babel-runtime": "^6.20.0",
     "case-sensitive-paths-webpack-plugin": "1.1.4",
     "chalk": "1.1.3",
@@ -82,8 +82,9 @@
   },
   "proxy": "http://localhost:4242",
   "scripts": {
-    "dev": "concurrently --kill-others \"nodemon --watch server\"  \"node scripts/start.js\"",
-    "build": "concurrently --kill-others \"yarn run start\"  \"node scripts/build.js\"",
+    "dev": "concurrently --kill-others \"nodemon --watch server\" \"node scripts/start.js\"",
+    "build": "node scripts/build.js",
+    "build-schema": "node scripts/build-schema",
     "prestart": "knex migrate:latest",
     "start": "node server/index.js"
   },
