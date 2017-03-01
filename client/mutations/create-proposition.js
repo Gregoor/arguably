@@ -17,7 +17,7 @@ export default class CreateProposition extends Relay.Mutation {
     return Relay.QL`
       fragment on CreatePropositionPayload {
         parent_proposition {
-          children
+          propositions
         }
         proposition_edge
       }

@@ -16,7 +16,7 @@ export default class UpdateProposition extends Relay.Mutation {
       fragment on DeletePropositionPayload {
         id
         parent_proposition {
-          children
+          propositions
         }
       }
     `
