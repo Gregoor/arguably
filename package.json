@@ -78,7 +78,7 @@
   },
   "proxy": "http://localhost:4242",
   "scripts": {
-    "dev": "concurrently --kill-others \"nodemon --watch server\" \"nodemon --watch server/graphql/ scripts/build-schema.js\" \"nodemon --watch data scripts/start.js\"",
+    "dev": "concurrently -p name -n \"server,schema,client\" --kill-others \"nodemon -q --watch server\" \"nodemon -q --watch server/graphql/ scripts/build-schema.js\" \"nodemon -q --watch data scripts/start.js\"",
     "install": "yarn run build-schema && node scripts/build.js",
     "build-schema": "node scripts/build-schema",
     "prestart": "knex migrate:latest",
