@@ -7,12 +7,14 @@ import PropositionCard from '../components/proposition-card';
 
 
 export default Relay.createContainer(
-  ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => (
+  ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => console.log(relay) || (
     <DocumentTitle title="Arguably">
       <InfiniteScroll
         hasMore={pageInfo.hasNextPage}
-        loadMore={() => relay.setVariables({first: relay.variables.first + 10})}
-        loader={<div>Loading ...</div>}>
+        loadMore={() => {
+          !relay.pendingVariables && relay.setVariables({first: relay.variables.first + 10})
+        }}
+        loader={<div style={{clear: 'both'}}>Loading ...</div>}>
         {edges.map(({node}) => (
           <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
         ))}
