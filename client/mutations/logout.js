@@ -14,7 +14,7 @@ export default class Logout extends Relay.Mutation {
     return Relay.QL`
       fragment on LogoutPayload {
         viewer {
-          root_propositions
+          propositions
           user
         }
       }

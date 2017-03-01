@@ -18,7 +18,7 @@ export default class Authorize extends Relay.Mutation {
       ? Relay.QL`
         fragment on RegisterPayload {
           viewer {
-            root_propositions
+            propositions
             user
           }
         }
@@ -26,7 +26,7 @@ export default class Authorize extends Relay.Mutation {
       : Relay.QL`
         fragment on LoginPayload {
           viewer {
-            root_propositions
+            propositions
             user
           }
         }
