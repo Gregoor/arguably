@@ -1,6 +1,9 @@
 const getBabelRelayPlugin = require('babel-relay-plugin');
+const {graphql}  = require('graphql');
+const {introspectionQuery} = require('graphql/utilities');
 
-const schemaData = require('../data/schema.json');
+const schema = require('../server/graphql');
 
 
-module.exports = getBabelRelayPlugin(schemaData.data);
+module.exports = (...babelArgs) => graphql(schema, introspectionQuery)
+  .then((result) => getBabelRelayPlugin(result.data));
