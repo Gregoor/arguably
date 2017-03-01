@@ -19,7 +19,6 @@
     "cors": "^2.8.1",
     "cross-spawn": "4.0.2",
     "css-loader": "0.26.1",
-    "detect-port": "^1.1.0",
     "dotenv": "^4.0.0",
     "eslint": "3.8.1",
     "eslint-config-react-app": "^0.5.2",
@@ -39,13 +38,10 @@
     "gzip-size": "3.0.0",
     "html-webpack-plugin": "2.24.0",
     "http-proxy-middleware": "0.17.3",
-    "isomorphic-relay": "^0.7.4",
     "json-loader": "0.5.4",
     "jsonwebtoken": "^7.3.0",
     "knex": "^0.12.6",
     "lodash": "^4.17.4",
-    "next": "2.0.0-beta.32",
-    "nodemon": "^1.11.0",
     "nprogress": "^0.2.0",
     "object-assign": "4.1.1",
     "pg": "^6.1.2",
@@ -71,10 +67,14 @@
     "styled-components": "^1.4.3",
     "url-loader": "0.5.7",
     "webpack": "1.14.0",
-    "webpack-dev-middleware": "^1.10.1",
     "webpack-dev-server": "1.16.2",
     "webpack-manifest-plugin": "1.1.0",
     "whatwg-fetch": "2.0.2"
+  },
+  "devDependencies": {
+    "detect-port": "^1.1.0",
+    "nodemon": "^1.11.0",
+    "webpack-dev-middleware": "^1.10.1"
   },
   "proxy": "http://localhost:4242",
   "scripts": {
