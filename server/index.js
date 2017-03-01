@@ -1,11 +1,12 @@
 require('dotenv').config();
 
 const {createServer} = require('http');
+const path = require('path');
 const url = require('url');
 
-const connect = require('connect');
+const compression = require('compression');
 const cors = require('cors');
-const gzip = require('connect-gzip');
+const express = require('express');
 const graphqlHTTP = require('express-graphql');
 const _ = require('lodash');
 
@@ -16,7 +17,7 @@ const PORT = process.env.PORT || 4242;
 const DEV_MODE = process.env.NODE_ENV == 'development';
 
 
-const app = connect();
+const app = express();
 
 app.use('/graphql', cors());
 app.use('/graphql', (req, res) => {
@@ -55,7 +56,9 @@ app.use('/graphql', (req, res) => {
   })(req, res);
 });
 
-app.use(gzip.staticGzip('build'));
+app.use(compression());
+app.use(express.static('build'));
+app.use((req, res) => res.sendFile(path.join(__dirname, '..', 'build', 'index.html')));
 
 createServer(app).listen(PORT, (err) => {
   if (err) throw err;

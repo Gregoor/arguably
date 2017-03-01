@@ -25,7 +25,7 @@ export default Relay.createContainer(
         <Link to="/">View all Propositions</Link>
         <h1 style={{margin: 0, fontVariant: 'small-caps'}}>Arguably</h1>
         {user
-          ? <div>Logged in as <b>{user.name}</b> (<a href="/" onClick={logout}>Logout</a>)</div>
+          ? <div>Logged in as <b>{user.name}</b> (<Link to="/" onClick={logout}>Logout</Link>)</div>
           : <Link href="/auth">Login/Register</Link>
         }
       </div>
