@@ -83,7 +83,7 @@
   "proxy": "http://localhost:4242",
   "scripts": {
     "dev": "concurrently --kill-others \"nodemon --watch server\" \"node scripts/start.js\"",
-    "build": "yarn run build-schema && node scripts/build.js",
+    "install": "yarn run build-schema && node scripts/build.js",
     "build-schema": "node scripts/build-schema",
     "prestart": "knex migrate:latest",
     "start": "node server/index.js"
