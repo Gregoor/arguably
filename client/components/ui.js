@@ -27,7 +27,7 @@ export const Card = styled.div`
   z-index: 1;
   box-sizing: border-box;
   border-radius: 2px;
-  margin: 0 0 16px 4px;
+  margin-bottom: 16px;
   padding-bottom: 8px;
   display: flex;
   flex-direction: column;

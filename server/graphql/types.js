@@ -1,9 +1,19 @@
 const {
-  GraphQLBoolean, GraphQLEnumType, GraphQLID, GraphQLInt, GraphQLNonNull, GraphQLObjectType,
+  GraphQLBoolean,
+  GraphQLEnumType,
+  GraphQLID,
+  GraphQLInterfaceType,
+  GraphQLInt,
+  GraphQLNonNull,
+  GraphQLObjectType,
   GraphQLString
 } = require('graphql');
 const {
-  connectionArgs, connectionDefinitions, fromGlobalId, globalIdField, nodeDefinitions
+  connectionArgs,
+  connectionDefinitions,
+  fromGlobalId,
+  globalIdField,
+  nodeDefinitions
 } = require('graphql-relay');
 const _ = require('lodash');
 
@@ -69,6 +79,17 @@ const UserGQL = new GraphQLObjectType({
   }
 });
 
+const PropositionsParentGQL = new GraphQLInterfaceType({
+  name: 'PropositionsParent',
+  fields: () => ({
+    propositions: {
+      type: PropositionConnection,
+      args: connectionArgs
+    }
+  }),
+  resolveType: ({id}) => id == 'Viewer' ? ViewerGQL : PropositionGQL
+});
+
 const PropositionTypeGQL = new GraphQLEnumType({
   name: 'PropositionType',
   values: {
@@ -85,7 +106,7 @@ const PropositionGQL = new GraphQLObjectType({
     text: {type: new GraphQLNonNull(GraphQLString)},
     source_url: {type: GraphQLString},
     votes: {type: new GraphQLNonNull(GraphQLInt)},
-    children: {
+    propositions: {
       type: PropositionConnection,
       args: connectionArgs,
       resolve: ({id}, args) => (
@@ -107,7 +128,7 @@ const PropositionGQL = new GraphQLObjectType({
       resolve: ({parent_id}) => parent_id ? Proposition({id: parent_id}).first() : null
     }
   }),
-  interfaces: [nodeInterface]
+  interfaces: [nodeInterface, PropositionsParentGQL]
 });
 
 const {
@@ -125,7 +146,7 @@ const ViewerGQL = new GraphQLObjectType({
         viewer.user || (user_id && User().where('id', user_id).first())
       )
     },
-    root_propositions: {
+    propositions: {
       type: PropositionConnection,
       args: connectionArgs,
       resolve: (viewer, args) => (
@@ -133,7 +154,7 @@ const ViewerGQL = new GraphQLObjectType({
       )
     }
   },
-  interfaces: [nodeInterface]
+  interfaces: [nodeInterface, PropositionsParentGQL]
 });
 
 

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import DocumentTitle from 'react-document-title';
 import Relay from 'react-relay';
-import InfiniteScroll from 'react-infinite-scroller';
 
 import PropositionCard from '../components/proposition-card';
+import PropositionList from '../components/proposition-list';
 
 
 class PropositionPage extends Component {
@@ -14,7 +14,7 @@ class PropositionPage extends Component {
   };
 
   render() {
-    const {proposition: {id, name, children, ...proposition}, viewer} = this.props;
+    const {proposition: {id, name, ...proposition}, viewer} = this.props;
     return (
       <DocumentTitle title={name + ' - Arguably'}><div>
 
@@ -24,14 +24,7 @@ class PropositionPage extends Component {
           <PropositionCard proposition={null} parentID={id} viewer={viewer}/>
         )}
 
-        <InfiniteScroll
-          hasMore={children.pageInfo.hasNextPage}
-          loadMore={this.loadMore}
-          loader={<div>Loading ...</div>}>
-          {children.edges.map(({node}) => (
-            <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
-          ))}
-        </InfiniteScroll>
+        <PropositionList parent={proposition} viewer={viewer}/>
 
       </div></DocumentTitle>
     );
@@ -50,17 +43,7 @@ PropositionPage = Relay.createContainer(PropositionPage, {
         id
         name
         ${PropositionCard.getFragment('proposition')}
-        children(first: $first) {
-          pageInfo {
-            hasNextPage
-          }
-          edges {
-            node {
-              id
-              ${PropositionCard.getFragment('proposition')}
-            }
-          }
-        }
+        ${PropositionList.getFragment('parent')}
       }
     `,
 
@@ -70,6 +53,7 @@ PropositionPage = Relay.createContainer(PropositionPage, {
           can_publish
         }
         ${PropositionCard.getFragment('viewer')}
+        ${PropositionList.getFragment('viewer')}
       }
     `
 

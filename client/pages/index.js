@@ -1,24 +1,14 @@
 import React from 'react';
 import DocumentTitle from 'react-document-title';
-import InfiniteScroll from 'react-infinite-scroller';
 import Relay from 'react-relay';
 
-import PropositionCard from '../components/proposition-card';
+import PropositionList from '../components/proposition-list';
 
 
 export default Relay.createContainer(
-  ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => (
+  ({viewer, relay}) => (
     <DocumentTitle title="Arguably">
-      <InfiniteScroll
-        hasMore={pageInfo.hasNextPage}
-        loadMore={() => {
-          !relay.pendingVariables && relay.setVariables({first: relay.variables.first + 10})
-        }}
-        loader={<div style={{clear: 'both'}}>Loading ...</div>}>
-        {edges.map(({node}) => (
-          <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
-        ))}
-      </InfiniteScroll>
+      <PropositionList parent={viewer} viewer={viewer}/>
     </DocumentTitle>
   ),
   {
@@ -27,18 +17,8 @@ export default Relay.createContainer(
 
     fragments: {viewer: () => Relay.QL`
       fragment on Viewer {
-        root_propositions(first: $first) {
-          pageInfo {
-            hasNextPage
-          }
-          edges {
-            node {
-              id
-              ${PropositionCard.getFragment('proposition')}
-            }
-          }
-        }
-        ${PropositionCard.getFragment('viewer')}
+        ${PropositionList.getFragment('parent')}
+        ${PropositionList.getFragment('viewer')}
       }
     `}
 
