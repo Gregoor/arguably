@@ -1,3 +1,4 @@
+import React from 'react';
 import styled, {injectGlobal} from 'styled-components';
 
 // eslint-disable-next-line
@@ -54,6 +55,7 @@ export const CardTitle = styled.h3`
   justify-content: stretch;
   line-height: normal;
   padding: 16px;
+  padding-bottom: 8px;
   perspective-origin: 165px 56px;
   transform-origin: 165px 56px;
   box-sizing: border-box;
@@ -64,20 +66,14 @@ export const FullWidthInput = styled.input`
   width: 100%;
 `;
 
+export const typeColors = {
+  PRO: '#81C784',
+  CONTRA: '#FF8A80'
+};
+
 export const Input = ({input, label, type, meta: {touched, error, warning}}) => (
   <div>
     <FullWidthInput {...input} type={type} placeholder={label}/>
     {touched && error && <div style={{color: typeColors.CONTRA}}>{error}</div>}
   </div>
 );
-
-export const typeColors = {
-  PRO: '#81C784',
-  CONTRA: '#FF8A80'
-};
-
-export const PageContainer = styled.div`
-  margin: 0 auto;
-  padding-top: 16px;
-  max-width: 700px;
-`;

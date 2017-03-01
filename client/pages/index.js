@@ -4,10 +4,9 @@ import InfiniteScroll from 'react-infinite-scroller';
 import Relay from 'react-relay';
 
 import PropositionCard from '../components/proposition-card';
-import Layout from '../components/layout';
 
 
-export default () => Layout(Relay.createContainer(
+export default Relay.createContainer(
   ({viewer: {root_propositions: {pageInfo, edges}, ...viewer}, relay}) => (
     <DocumentTitle title="Arguably">
       <InfiniteScroll
@@ -42,4 +41,4 @@ export default () => Layout(Relay.createContainer(
     `}
 
   }
-));
+);

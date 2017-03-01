@@ -5,7 +5,7 @@ import Relay from 'react-relay';
 import DeletePropositionMutation from '../../mutations/delete-proposition';
 import CreatePropositionMutation from '../../mutations/create-proposition';
 import UpdatePropositionMutation from '../../mutations/update-proposition';
-import {Card, CardSection, CardTitle, FullWidthInput, typeColors} from '../ui';
+import {Card, CardSection, CardTitle, FullWidthInput} from '../ui';
 import {PropositionLink, StatsBar, TypeTag, TypeTagBar} from './components';
 
 const SourceSection = ({children}) => (

@@ -1,16 +1,19 @@
-import Router from 'next/router';
-import React, {Component} from 'react';
+import React from 'react';
+import {Link} from 'react-router';
 import styled from 'styled-components';
 
 import {CardSection, typeColors} from '../ui';
 
 export const PropositionLink = styled(
   ({children, id, ...props}) => (
-    <div onClick={() => Router.push(`/proposition?id=${id}`)} {...props}>
+    <Link to={`/proposition/${id}`} {...props}>
       {children}
-    </div>
+    </Link>
   )
 )`
+  color: black !important;
+  text-decoration: none;
+  
   &:hover {
     text-decoration: underline;
     cursor: pointer;

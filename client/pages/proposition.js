@@ -4,7 +4,6 @@ import Relay from 'react-relay';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import PropositionCard from '../components/proposition-card';
-import Layout from '../components/layout';
 
 
 class PropositionPage extends Component {
@@ -78,28 +77,25 @@ PropositionPage = Relay.createContainer(PropositionPage, {
 
 });
 
-export default () => Layout(
-  Relay.createContainer(
-    ({node, viewer}) => <PropositionPage proposition={node} viewer={viewer}/>,
-    {
-      fragments: {
+export default Relay.createContainer(
+  ({node, viewer}) => <PropositionPage proposition={node} viewer={viewer}/>,
+  {
+    fragments: {
 
-        node: () => Relay.QL`
-          fragment on Node {
-            ${PropositionPage.getFragment('proposition')}
-          }
-        `,
+      node: () => Relay.QL`
+        fragment on Node {
+          ${PropositionPage.getFragment('proposition')}
+        }
+      `,
 
-        viewer: () => Relay.QL`
-          fragment on Viewer {
-            ${PropositionPage.getFragment('viewer')}
-          }
-        `
+      viewer: () => Relay.QL`
+        fragment on Viewer {
+          ${PropositionPage.getFragment('viewer')}
+        }
+      `
 
-      }
     }
-  ),
-  ['node', 'viewer']
+  }
 );
 
 

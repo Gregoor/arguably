@@ -1,14 +1,13 @@
 import _ from 'lodash';
-import Router from 'next/router'
 import React from 'react';
 import Relay from 'react-relay';
 import {connect} from 'react-redux'
+import {browserHistory} from 'react-router';
 import {formValueSelector, Field, reduxForm} from 'redux-form';
 
 import AuthorizeMutation from '../mutations/authorize';
-import {asSubmissionError} from '../client/helpers';
-import Layout from '../components/layout';
-import store from '../client/store';
+import {asSubmissionError} from '../helpers';
+import store from '../store';
 import {Card, CardSection, CardTitle, Input} from '../components/ui'
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -21,7 +20,7 @@ const authorize = (data) => new Promise((resolve, reject) => (
       const data = login || register;
       store.dispatch({type: 'LOGIN', jwt: data.jwt});
       resolve(data);
-      Router.push('/');
+      browserHistory.push('/');
     },
     onFailure: (t) => reject(asSubmissionError(t, {
       name: {
@@ -59,8 +58,7 @@ const AuthPage = ({handleSubmit, invalid, isNew, viewer: user, ...props}) => (
     </CardSection>
   </form></Card>
 );
-
-export default () => Layout(_.flow([
+export default _.flow([
 
   reduxForm({
     form: FORM_STORE_KEY,
@@ -75,28 +73,21 @@ export default () => Layout(_.flow([
       }
 
       if (!isNew) return errors;
+
       if (!password || password.length < MIN_PASSWORD_LENGTH) {
         errors.password = `Has to be at least ${MIN_PASSWORD_LENGTH} characters long`;
       }
-      if (password != passwordRepeat) {
+
+      if (password !== passwordRepeat) {
         errors.passwordRepeat = 'Must match password';
       }
+
       return errors;
     }
   }),
 
   connect(
     (state) => ({isNew: formValueSelector(FORM_STORE_KEY)(state, 'isNew')})
-  ),
+  )
 
-  (AuthPage) => Relay.createContainer(AuthPage, {
-    fragments: {viewer: () => Relay.QL`
-      fragment on Viewer {
-        user {
-          name
-        }
-      }
-    `}
-  })
-
-])(AuthPage));
+])(AuthPage);

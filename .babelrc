@@ -1,4 +1,4 @@
 {
-  "presets": ["next/babel"],
-  "plugins": ["react-relay"]
+  "presets": ["react-app"],
+  "plugins": ["babel-plugin-transform-es2015-modules-commonjs", "react-relay"]
 }

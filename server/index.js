@@ -2,39 +2,24 @@ require('dotenv').config();
 
 const {createServer} = require('http');
 const url = require('url');
+
+const connect = require('connect');
+const cors = require('cors');
+const gzip = require('connect-gzip');
 const graphqlHTTP = require('express-graphql');
 const _ = require('lodash');
-const next = require('next');
 
 const schema = require('./graphql');
 const {JSONError, jwt} = require('./helpers');
 
+const PORT = process.env.PORT || 4242;
+const DEV_MODE = process.env.NODE_ENV == 'development';
 
-const PORT = process.env.PORT || 3000;
 
-const start = async () => {
-  const app = next({dev: process.env.NODE_ENV == 'development'});
-  const nextHandle = app.getRequestHandler();
+const app = connect();
 
-  app.prepare();
-  createServer((req, res) => {
-    const {pathname} = url.parse(req.url, true);
-
-    res.setHeader('Access-Control-Allow-Headers', req.headers.host);
-
-    if (['GET', 'POST'].includes(req.method) && pathname === '/graphql') {
-      handleGraphQL(req, res);
-    } else {
-      nextHandle(req, res);
-    }
-  })
-    .listen(PORT, (err) => {
-      if (err) throw err;
-      console.log('> Ready on', PORT);
-    });
-};
-
-const handleGraphQL = (req, res) => {
+app.use('/graphql', cors());
+app.use('/graphql', (req, res) => {
   const authorization = req.headers['authorization'];
   if (authorization) {
     const [authType, token] = authorization.split(' ');
@@ -49,7 +34,7 @@ const handleGraphQL = (req, res) => {
   }
   graphqlHTTP({
     schema,
-    graphiql: process.env.NODE_ENV != 'production',
+    graphiql: DEV_MODE,
     formatError: (error) => {
       try {
         return {
@@ -58,7 +43,7 @@ const handleGraphQL = (req, res) => {
         };
       } catch (e) {
         console.error(error);
-        return process.env.NODE_ENV == 'development'
+        return DEV_MODE
           ? {
             message: error.message,
             locations: error.locations,
@@ -68,8 +53,11 @@ const handleGraphQL = (req, res) => {
       }
     }
   })(req, res);
-};
+});
 
-start().catch((e) => {
-  console.error(e);
+app.use(gzip.staticGzip('build'));
+
+createServer(app).listen(PORT, (err) => {
+  if (err) throw err;
+  console.log('> Ready on', PORT);
 });

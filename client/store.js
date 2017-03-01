@@ -17,7 +17,6 @@ export default createStore(combineReducers({
 
       case 'LOGOUT':
         store.clearAll();
-        location.href = '/';
         return {...state, jwt: null};
 
       default:
