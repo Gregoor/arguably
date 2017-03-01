@@ -4,7 +4,7 @@ import Relay from 'react-relay';
 import {Link} from 'react-router';
 import styled from 'styled-components';
 
-import LogoutMutaiton from './mutations/logout';
+import logout from './logout'
 import store from './store';
 
 
@@ -13,11 +13,6 @@ const PageContainer = styled.div`
   padding-top: 16px;
   max-width: 700px;
 `;
-
-const logout = () => {
-  store.dispatch({type: 'LOGOUT'});
-  Relay.Store.commitUpdate(new LogoutMutaiton());
-};
 
 export default Relay.createContainer(
   ({children, viewer: {user}}) => (

@@ -9,6 +9,7 @@ import useRelay from 'react-router-relay';
 
 import store from './store';
 import Layout from './layout';
+import logout from './logout';
 
 import AuthPage from './pages/auth';
 import PropositionPage from './pages/proposition';
@@ -32,13 +33,29 @@ Relay.injectNetworkLayer(new RelayNetworkLayer([
 const node = () => Relay.QL`query { node(id: $nodeID) }`;
 const viewer = () => Relay.QL`query { viewer }`;
 
+const logoutOnInvalidToken = ({error, props}) => {
+  if (error && error.json) {
+    for (const {message} of error.json.errors) {
+      console.error(message);
+      const parsedError = JSON.parse(message);
+
+      if (parsedError.jwt) {
+        logout();
+        location.href = '/';
+      }
+    }
+  }
+  return props && <Layout {...props} />;
+};
+
+
 ReactDOM.render(
   <Router
     history={browserHistory}
     render={applyRouterMiddleware(useRelay)}
     environment={Relay.Store}
   >
-    <Route path="/" component={Layout} queries={{viewer}}>
+    <Route path="/" component={Layout} queries={{viewer}} render={logoutOnInvalidToken}>
       <IndexRoute component={IndexPage} queries={{viewer}}/>
       <Route path="auth" component={AuthPage}/>
       <Route path="proposition/:nodeID" component={PropositionPage} queries={{node, viewer}}/>

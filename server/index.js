@@ -20,7 +20,7 @@ const DEV_MODE = process.env.NODE_ENV == 'development';
 const app = express();
 
 app.use('/graphql', cors());
-app.use('/graphql', (req, res) => {
+app.use('/graphql', graphqlHTTP((req) => {
   const authorization = req.headers['authorization'];
   if (authorization) {
     const [authType, token] = authorization.split(' ');
@@ -29,11 +29,13 @@ app.use('/graphql', (req, res) => {
         req.user_id = jwt.safeDecode(token).user_id;
       } catch (e) {
         const [messageStart, ...messageRest] = e.message.split(' ');
-        throw JSONError({jwt: [messageStart == 'jwt' ? messageRest.join(' ') : e.message]});
+        throw JSONError({
+          jwt: [(messageStart == 'jwt' ? messageRest : e.message.split(' ')).join('_')]
+        });
       }
     }
   }
-  graphqlHTTP({
+  return {
     schema,
     graphiql: DEV_MODE,
     formatError: (error) => {
@@ -53,8 +55,8 @@ app.use('/graphql', (req, res) => {
           : {message: 'no can do'};
       }
     }
-  })(req, res);
-});
+  };
+}));
 
 app.use(compression());
 app.use(express.static('build'));
