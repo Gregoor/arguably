@@ -4,6 +4,7 @@ import Relay from 'react-relay';
 import {Link} from 'react-router';
 import styled from 'styled-components';
 
+import LogoutMutaiton from './mutations/logout';
 import store from './store';
 
 
@@ -15,7 +16,7 @@ const PageContainer = styled.div`
 
 const logout = () => {
   store.dispatch({type: 'LOGOUT'});
-  location.href = '/';
+  Relay.Store.commitUpdate(new LogoutMutaiton());
 };
 
 export default Relay.createContainer(

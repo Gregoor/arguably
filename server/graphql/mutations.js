@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const {
-  GraphQLBoolean,
   GraphQLID,
   GraphQLInputObjectType,
   GraphQLNonNull,
@@ -134,7 +133,6 @@ module.exports = {
       if (password.length < 8) {
         throw JSONError({password: ['too_short']});
       }
-      name = name.trim().toLowerCase();
       if (await User.firstByName(name)) {
         throw JSONError({name: ['exists']});
       }
@@ -174,6 +172,14 @@ module.exports = {
         }
       }
     }
+  }),
+
+  logout: mutationWithClientMutationId({
+    name: 'Logout',
+    outputFields: {
+      viewer: {type: new GraphQLNonNull(ViewerGQL)}
+    },
+    mutateAndGetPayload: () => ({viewer: {}})
   })
 
 };
