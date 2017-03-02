@@ -6,8 +6,7 @@ import {Field, reduxForm} from 'redux-form';
 import styled from 'styled-components';
 
 import DeletePropositionMutation from '../../mutations/delete-proposition';
-import CreatePropositionMutation from '../../mutations/create-proposition';
-import UpdatePropositionMutation from '../../mutations/update-proposition';
+import SavePropositionMutation from '../../mutations/save-proposition';
 import {Card, CardSection, CardTitle, Input} from '../ui';
 import {StatsBar, SourceSection, TypeTag} from './components';
 
@@ -37,19 +36,21 @@ class Form extends React.Component {
     onCancel: _.noop
   };
 
-  save = ({name, source_url, text, type}) => {
+  save = (values) => {
     const {parentID, proposition} = this.props;
     const {id} = proposition || {};
 
-    const data = {id, name, source_url, text, type};
+    const data = {id, ..._.pick(values, 'name', 'source_url', 'published', 'text', 'type')};
     if (parentID && parentID !== 'viewer') {
       data.parent_id = parentID;
     }
-    Relay.Store.commitUpdate(
-      new (id ? UpdatePropositionMutation : CreatePropositionMutation)({proposition})
-    );
-    this.props.reset();
-    this.props.onCancel();
+    return new Promise((resolve) => Relay.Store.commitUpdate(new SavePropositionMutation(data), {
+      onSuccess: () => {
+        this.props.reset();
+        this.props.onCancel();
+        resolve();
+      }
+    }));
   };
 
   del = () => {
@@ -60,7 +61,7 @@ class Form extends React.Component {
   };
 
   render() {
-    const {handleSubmit, onCancel, proposition, viewer: {user}} = this.props;
+    const {handleSubmit, onCancel, proposition, submitting, viewer: {user}} = this.props;
     return (
       <Card>
         <form onSubmit={handleSubmit(this.save)}>
@@ -85,6 +86,15 @@ class Form extends React.Component {
             <Field component={Input} name="source_url" type="text"/>
           </SourceSection>
 
+          {user.can_publish && (
+            <CardSection>
+              <label>
+                <Field component="input" name="published" type="checkbox"/>
+                Published
+              </label>
+            </CardSection>
+          )}
+
           <StatsBar>
             <div/>
             <div>
@@ -94,7 +104,9 @@ class Form extends React.Component {
                   <button key="delete" type="button" onClick={this.del}>Delete</button>
                 )
               ]}
-              <button key="save" type="submit">{proposition ? 'Save' : 'Create'}</button>
+              <button key="save" type="submit" disabled={submitting}>
+                {proposition ? 'Save' : 'Create'}
+              </button>
             </div>
           </StatsBar>
 
@@ -114,6 +126,7 @@ export default _.flow([
       form: 'proposition' + (proposition ? proposition.id : ''),
       initialValues: {
         name: '',
+        published: false,
         source_url: '',
         text: '',
         type: Math.random() > .5 ? 'PRO' : 'CONTRA',
@@ -130,10 +143,10 @@ export default _.flow([
         fragment on Proposition {
           id
           name
+          published
           source_url
           text
           type
-          published
         }
       `,
 

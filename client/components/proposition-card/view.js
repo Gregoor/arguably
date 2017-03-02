@@ -60,6 +60,7 @@ export default Relay.createContainer(
           id
           propositions_count
           name
+          published
           source_url
           text
           type
@@ -67,7 +68,6 @@ export default Relay.createContainer(
             id
             name
           }
-          published
         }
       `,
 

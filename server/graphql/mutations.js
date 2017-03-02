@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const {
   GraphQLID,
+  GraphQLBoolean,
   GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLString
@@ -30,7 +31,8 @@ const PropositionInputGQL = new GraphQLInputObjectType({
     text: {type: GraphQLString},
     parent_id: {type: GraphQLID},
     type: {type: PropositionTypeGQL},
-    source_url: {type: GraphQLString}
+    source_url: {type: GraphQLString},
+    published: {type: GraphQLBoolean}
   }
 });
 
@@ -64,9 +66,6 @@ module.exports = {
       parent_proposition: {type: PropositionGQL}
     },
     mutateAndGetPayload: authify(async(user, {proposition: propositionData}) => {
-      console.log(Proposition()
-        .insert(Object.assign(processPropositionInput(propositionData), {user_id: user.id}))
-        .returning('id').toString())
       const [id] = await Proposition()
         .insert(Object.assign(processPropositionInput(propositionData), {user_id: user.id}))
         .returning('id');
