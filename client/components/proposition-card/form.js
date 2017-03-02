@@ -77,15 +77,16 @@ class Form extends React.Component {
           )}
 
           <CardTitle>
-            <Field component={Input} type="text" name="name"/>
+            <Field component={Input} type="text" name="name" label="Make a concise argument"/>
           </CardTitle>
 
           <CardSection>
-            <Field component="textarea" name="text" style={{width: '100%'}}/>
+            <Field component="textarea" name="text" style={{width: '100%'}}
+                   placeholder="(Optional) extra text"/>
           </CardSection>
 
           <SourceSection>
-            <Field component={Input} name="source_url" type="text"/>
+            <Field component={Input} name="source_url" type="text" label="Source URL"/>
           </SourceSection>
 
           {user.can_publish && (
