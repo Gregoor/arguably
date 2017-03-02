@@ -1,24 +1,8 @@
 import React from 'react';
-import {Link} from 'react-router';
 import styled from 'styled-components';
 
 import {CardSection, typeColors} from '../ui';
 
-export const PropositionLink = styled(
-  ({children, id, ...props}) => (
-    <Link to={`/proposition/${id}`} {...props}>
-      {children}
-    </Link>
-  )
-)`
-  color: black !important;
-  text-decoration: none;
-  
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-`;
 
 export const StatsBar = styled(CardSection)`
   display: flex;

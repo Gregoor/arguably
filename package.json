@@ -64,6 +64,7 @@
     "strip-ansi": "3.0.1",
     "style-loader": "0.13.1",
     "styled-components": "^1.4.3",
+    "svg-inline-loader": "^0.7.1",
     "url-loader": "0.5.7",
     "webpack": "1.14.0",
     "webpack-dev-server": "1.16.2",

@@ -1,9 +1,50 @@
 import React from 'react';
 import Relay from 'react-relay';
+import {Link} from 'react-router';
+import styled from 'styled-components';
 
 import {Card, CardSection, CardTitle} from '../ui';
-import {PropositionLink, StatsBar, SourceSection, TypeTag} from './components';
+import {StatsBar, SourceSection, TypeTag} from './components';
 
+import arrows from './ic_compare_arrows_black_24px.svg';
+
+
+const PropositionLink = ({children, id, ...props}) => (
+  <Link to={`/proposition/${id}`} {...props}>
+    {children}
+  </Link>
+);
+
+const PropositionTitleLink = styled(PropositionLink)`
+  color: black !important;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+`;
+
+const ImageLink = styled(PropositionLink)`
+  display: flex;
+  align-items: center;
+  color: #aab8c2 !important;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  
+  svg {
+    fill: #aab8c2;  
+  }
+  
+  &:focus, &:hover {
+    color: black !important;
+    
+    svg {
+      fill: black;  
+    }
+  }
+`;
 
 export default Relay.createContainer(
   ({
@@ -22,9 +63,9 @@ export default Relay.createContainer(
       )}
 
       {withParent && parent && (
-        <CardTitle><PropositionLink id={parent.id} style={{opacity: .5}}>
+        <CardTitle><PropositionTitleLink id={parent.id} style={{opacity: .5}}>
           {parent.name}
-        </PropositionLink></CardTitle>
+        </PropositionTitleLink></CardTitle>
       )}
 
       {type && (
@@ -34,16 +75,17 @@ export default Relay.createContainer(
       )}
 
       <CardTitle>
-        <PropositionLink id={id}>{name}</PropositionLink>
+        <PropositionTitleLink id={id}>{name}</PropositionTitleLink>
       </CardTitle>
 
       {text && <CardSection>{text}</CardSection>}
       {source_url && <SourceSection><a href={source_url}>{source_url}</a></SourceSection>}
 
       <StatsBar>
-        <div>
-          <b>Arguments:</b> {propositions_count}
-        </div>
+        <ImageLink id={id} title="Discuss">
+          <span style={{width: 20, marginRight: 4}} dangerouslySetInnerHTML={{__html: arrows}}/>
+          {propositions_count}
+        </ImageLink>
         {user && (user.can_publish || (!published && author.id)) && (
           <button type="button" onClick={onEdit}>
             Edit
