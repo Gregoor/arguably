@@ -12,7 +12,7 @@ const PropositionPage = Relay.createContainer(
 
       <PropositionCard {...{proposition, viewer}} withParent/>
 
-      {viewer.user && viewer.user.can_publish && (
+      {viewer.user && (
         <PropositionCard proposition={null} parentID={id} viewer={viewer}/>
       )}
 

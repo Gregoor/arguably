@@ -8,7 +8,9 @@ import {PropositionLink, StatsBar, SourceSection, TypeTag} from './components';
 export default Relay.createContainer(
   ({
     onEdit,
-    proposition: {id, propositions_count, published, parent, source_url, text, type, name},
+    proposition: {
+      user: author, id, name, propositions_count, published, parent, source_url, text, type
+    },
     viewer: {user},
     withParent
   }) => (
@@ -42,7 +44,7 @@ export default Relay.createContainer(
         <div>
           <b>Arguments:</b> {propositions_count}
         </div>
-        {user && user.can_publish && (
+        {user && (user.can_publish || (!published && author.id)) && (
           <button type="button" onClick={onEdit}>
             Edit
           </button>
@@ -58,15 +60,18 @@ export default Relay.createContainer(
       proposition: () => Relay.QL`
         fragment on Proposition {
           id
-          propositions_count
           name
+          parent {
+            id
+            name
+          }
+          propositions_count
           published
           source_url
           text
           type
-          parent {
+          user {
             id
-            name
           }
         }
       `,

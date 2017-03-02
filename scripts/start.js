@@ -72,11 +72,7 @@ function setupCompiler(host, port, protocol) {
     }
 
     if (showInstructions) {
-      console.log();
-      console.log('The app is running at:');
-      console.log();
       console.log('  ' + chalk.cyan(protocol + '://' + host + ':' + port + '/'));
-      console.log();
       isFirstCompile = false;
     }
 
@@ -256,8 +252,7 @@ function runDevServer(host, port, protocol) {
     if (isInteractive) {
       clearConsole();
     }
-    console.log(chalk.cyan('Starting the development server...'));
-    console.log();
+    console.log(chalk.cyan('Starting...'));
   });
 }
 

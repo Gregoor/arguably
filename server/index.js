@@ -4,6 +4,7 @@ const {createServer} = require('http');
 const path = require('path');
 const url = require('url');
 
+const chalk = require('chalk');
 const compression = require('compression');
 const cors = require('cors');
 const express = require('express');
@@ -62,7 +63,8 @@ app.use(compression());
 app.use(express.static('build'));
 app.use((req, res) => res.sendFile(path.join(__dirname, '..', 'build', 'index.html')));
 
+console.log(chalk.cyan('Starting...'));
 createServer(app).listen(PORT, (err) => {
   if (err) throw err;
-  console.log('> Ready on', PORT);
+  console.log('  ' + chalk.cyan(`http://localhost:${PORT}`))
 });

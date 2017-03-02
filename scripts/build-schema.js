@@ -15,21 +15,24 @@ if (!fs.existsSync(schemaPath)) fs.mkdirSync(schemaPath);
 
 const schemaFilePath = path.join(schemaPath, 'schema');
 
-fs.writeFileSync(
-  `${schemaFilePath}.graphql`,
-  printSchema(schema)
-);
-
 graphql(schema, introspectionQuery).then((result) => {
   const filePath = `${schemaFilePath}.json`;
   const json = JSON.stringify(result, null, 2);
 
-  if (fs.statSync(filePath) && fs.readFileSync(filePath, 'utf-8') != json) {
-    console.log(chalk.yellow('Schema changed. You should restart the client process!'));
+  if (fs.statSync(filePath)) {
+    if (fs.readFileSync(filePath, 'utf-8') != json) {
+      console.log(chalk.yellow('Schema changed. You should restart the client process!'));
+    } else {
+      process.exit();
+    }
   } else {
-    console.log(chalk.green('Done'));
+    console.log(chalk.green('Nothing changed'));
   }
 
   fs.writeFileSync(filePath, json);
+  fs.writeFileSync(
+    `${schemaFilePath}.graphql`,
+    printSchema(schema)
+  );
   process.exit();
 });

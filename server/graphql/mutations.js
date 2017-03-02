@@ -11,7 +11,14 @@ const _ = require('lodash');
 
 const {JSONError, jwt} = require('../helpers');
 const {Proposition, User} = require('../models');
-const {PropositionEdge, PropositionGQL, PropositionTypeGQL, ViewerGQL} = require('./types');
+const {resolveWithRequiredUser} = require('./resolvers');
+const {
+  PropositionEdge,
+  PropositionGQL,
+  PropositionsParentGQL,
+  PropositionTypeGQL,
+  ViewerGQL
+} = require('./types');
 
 const SALT_ROUNDS = 10;
 
@@ -21,7 +28,11 @@ const localizeIDs = (data, ...ids) => _.mapValues(data, (value, key) => (
   ids.includes(key) ? localizeID(value) : value
 ));
 
-const processPropositionInput = (input) => _.omit(localizeIDs(input, 'parent_id'), 'id');
+const processPropositionInput = (input, user) => _.omit(
+  localizeIDs(input, 'parent_id'),
+  'id',
+  !user.can_publish && 'published'
+);
 
 const PropositionInputGQL = new GraphQLInputObjectType({
   name: 'PropositionInput',
@@ -35,18 +46,6 @@ const PropositionInputGQL = new GraphQLInputObjectType({
     published: {type: GraphQLBoolean}
   }
 });
-
-const authify = (resolver) => (input, req, ...args) => {
-  const id = req.user_id;
-  if (!id) {
-    throw JSONError({jwt: ['missing']});
-  }
-  return User().where({id}).first()
-    .then((user) => {
-      if (user.can_publish) return resolver(user, input, req, ...args);
-      throw JSONError({jwt: ['unauthorized']});
-    });
-};
 
 module.exports = {
 
@@ -65,9 +64,9 @@ module.exports = {
       },
       parent_proposition: {type: PropositionGQL}
     },
-    mutateAndGetPayload: authify(async(user, {proposition: propositionData}) => {
+    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition: propositionData}) => {
       const [id] = await Proposition()
-        .insert(Object.assign(processPropositionInput(propositionData), {user_id: user.id}))
+        .insert(Object.assign(processPropositionInput(propositionData, user), {user_id: user.id}))
         .returning('id');
 
       const proposition = Proposition({id});
@@ -86,10 +85,12 @@ module.exports = {
     outputFields: {
       proposition: {type: new GraphQLNonNull(PropositionGQL)}
     },
-    mutateAndGetPayload: authify(async(user, {proposition: propositionData}, req) => {
+    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition: propositionData}) => {
       const id = localizeID(propositionData.id);
 
-      await Proposition({id}).update(processPropositionInput((propositionData)));
+      await Proposition
+        .forUserChange(user, {id})
+        .update(processPropositionInput(propositionData, user));
 
       return {proposition: Proposition({id}).first()};
     })
@@ -102,18 +103,16 @@ module.exports = {
     },
     outputFields: {
       id: {type: new GraphQLNonNull(GraphQLID)},
-      parent_proposition: {type: new GraphQLNonNull(PropositionGQL)}
+      parent: {type: new GraphQLNonNull(PropositionsParentGQL)}
     },
-    mutateAndGetPayload: authify(async(user, {id}) => {
-      const localID = localizeID(id);
-
-      const proposition = Proposition({id: localID});
+    mutateAndGetPayload: resolveWithRequiredUser(async(user, {id}) => {
+      const proposition = Proposition.forUserChange(user, {id: localizeID(id)});
       const parent = await proposition.parent();
       await proposition.del();
 
       return {
         id,
-        parent_proposition: parent
+        parent: parent || {id: 'viewer'}
       }
     })
   }),

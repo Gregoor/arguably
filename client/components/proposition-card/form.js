@@ -100,7 +100,7 @@ class Form extends React.Component {
             <div>
               {proposition && [
                 <button key="cancel" type="button" onClick={onCancel}>Cancel</button>,
-                user.can_publish && (
+                user.can_publish || (!proposition.published && proposition.user.id) && (
                   <button key="delete" type="button" onClick={this.del}>Delete</button>
                 )
               ]}
@@ -126,7 +126,7 @@ export default _.flow([
       form: 'proposition' + (proposition ? proposition.id : ''),
       initialValues: {
         name: '',
-        published: false,
+        published: true,
         source_url: '',
         text: '',
         type: Math.random() > .5 ? 'PRO' : 'CONTRA',
@@ -147,6 +147,9 @@ export default _.flow([
           source_url
           text
           type
+          user {
+            id
+          }
         }
       `,
 

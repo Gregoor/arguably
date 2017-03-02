@@ -15,7 +15,7 @@ export default class UpdateProposition extends Relay.Mutation {
     return Relay.QL`
       fragment on DeletePropositionPayload {
         id
-        parent_proposition {
+        parent {
           propositions
         }
       }
@@ -25,11 +25,11 @@ export default class UpdateProposition extends Relay.Mutation {
   getConfigs() {
     return [{
       type: 'RANGE_DELETE',
-      parentName: 'parent_proposition',
+      parentName: 'parent',
       parentID: this.props.parent_id,
-      connectionName: 'children',
+      connectionName: 'propositions',
       deletedIDFieldName: 'id',
-      pathToConnection: ['parent_proposition', 'children']
+      pathToConnection: ['parent', 'propositions']
     }];
   }
 

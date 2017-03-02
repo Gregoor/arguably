@@ -59,7 +59,7 @@ const {nodeInterface, nodeField} = nodeDefinitions(
     const {id, type} = fromGlobalId(globalId);
 
     if (type == 'Proposition') {
-      return Proposition.forUser(user).where({id}).first();
+      return Proposition.forUserView(user, {id}).first();
     }
 
     return {};
@@ -89,7 +89,7 @@ const PropositionsParentGQL = new GraphQLInterfaceType({
       args: connectionArgs
     }
   }),
-  resolveType: ({id}) => id == 'Viewer' ? ViewerGQL : PropositionGQL
+  resolveType: ({id}) => id == 'viewer' ? ViewerGQL : PropositionGQL
 });
 
 const PropositionTypeGQL = new GraphQLEnumType({
@@ -105,28 +105,32 @@ const PropositionGQL = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField(),
     name: {type: new GraphQLNonNull(GraphQLString)},
-    text: {type: new GraphQLNonNull(GraphQLString)},
-    source_url: {type: GraphQLString},
-    votes: {type: new GraphQLNonNull(GraphQLInt)},
+    parent: {
+      type: PropositionGQL,
+      resolve: ({id}) => Proposition({id}).parent()
+    },
     propositions: {
       type: PropositionConnection,
       args: connectionArgs,
       resolve: resolveWithUser((user, {id}, args) => (
-        knexToConnection(Proposition.forUser(user).where('parent_id', id), args)
+        knexToConnection(Proposition.forUserView(user, {parent_id: id}), args)
       ))
     },
-    published: {type: new GraphQLNonNull(GraphQLBoolean)},
     propositions_count: {
       type: new GraphQLNonNull(GraphQLInt),
       resolve: async({id, child_count}) => child_count || (
         (await Proposition({parent_id: id}).count().first()).count
       )
     },
+    published: {type: new GraphQLNonNull(GraphQLBoolean)},
+    source_url: {type: GraphQLString},
+    text: {type: new GraphQLNonNull(GraphQLString)},
     type: {type: PropositionTypeGQL},
-    parent: {
-      type: PropositionGQL,
-      resolve: ({parent_id}) => parent_id ? Proposition({id: parent_id}).first() : null
-    }
+    user: {
+      type: new GraphQLNonNull(UserGQL),
+      resolve: ({id}) => ({}) || Proposition({id}).user()
+    },
+    votes: {type: new GraphQLNonNull(GraphQLInt)}
   }),
   interfaces: [nodeInterface, PropositionsParentGQL]
 });
@@ -150,7 +154,7 @@ const ViewerGQL = new GraphQLObjectType({
       type: new GraphQLNonNull(PropositionConnection),
       args: connectionArgs,
       resolve: resolveWithUser((user, viewer, args) => (
-        knexToConnection(Proposition.forUser(user).where('parent_id', null), args)
+        knexToConnection(Proposition.forUserView(user).where('parent_id', null), args)
       ))
     }
   },
@@ -158,4 +162,11 @@ const ViewerGQL = new GraphQLObjectType({
 });
 
 
-module.exports = {nodeField, PropositionEdge, PropositionGQL, PropositionTypeGQL, ViewerGQL};
+module.exports = {
+  nodeField,
+  PropositionEdge,
+  PropositionGQL,
+  PropositionsParentGQL,
+  PropositionTypeGQL,
+  ViewerGQL
+};
