@@ -100,7 +100,7 @@ class Form extends React.Component {
             <div>
               {proposition && [
                 <button key="cancel" type="button" onClick={onCancel}>Cancel</button>,
-                user.can_publish || (!proposition.published && proposition.user.id) && (
+                (user.can_publish || (!proposition.published && proposition.user.id)) && (
                   <button key="delete" type="button" onClick={this.del}>Delete</button>
                 )
               ]}

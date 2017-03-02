@@ -118,9 +118,9 @@ const PropositionGQL = new GraphQLObjectType({
     },
     propositions_count: {
       type: new GraphQLNonNull(GraphQLInt),
-      resolve: async({id, child_count}) => child_count || (
-        (await Proposition({parent_id: id}).count().first()).count
-      )
+      resolve: resolveWithUser(async(user, {id, child_count}) => child_count || (
+        (await Proposition.forUserView(user, {parent_id: id}).count().first()).count
+      ))
     },
     published: {type: new GraphQLNonNull(GraphQLBoolean)},
     source_url: {type: GraphQLString},
