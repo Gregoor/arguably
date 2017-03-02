@@ -17,6 +17,7 @@ export default class UpdateProposition extends Relay.Mutation {
         id
         parent {
           propositions
+          propositions_count
         }
       }
     `

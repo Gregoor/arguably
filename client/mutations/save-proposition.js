@@ -34,6 +34,7 @@ export default class SaveProposition extends Relay.Mutation {
         fragment on CreatePropositionPayload {
           parent_proposition {
             propositions
+            propositions_count
           }
           proposition_edge
         }

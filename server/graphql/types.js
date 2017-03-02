@@ -87,7 +87,8 @@ const PropositionsParentGQL = new GraphQLInterfaceType({
     propositions: {
       type: PropositionConnection,
       args: connectionArgs
-    }
+    },
+    propositions_count: {type: new GraphQLNonNull(GraphQLInt)}
   }),
   resolveType: ({id}) => id == 'viewer' ? ViewerGQL : PropositionGQL
 });
@@ -155,6 +156,12 @@ const ViewerGQL = new GraphQLObjectType({
       args: connectionArgs,
       resolve: resolveWithUser((user, viewer, args) => (
         knexToConnection(Proposition.forUserView(user).where('parent_id', null), args)
+      ))
+    },
+    propositions_count: {
+      type: new GraphQLNonNull(GraphQLInt),
+      resolve: resolveWithUser(async (user) => (
+        (await Proposition.forUserView(user).where('parent_id', null).count().first()).count
       ))
     }
   },
