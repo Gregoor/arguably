@@ -62,7 +62,7 @@ module.exports = {
           node: proposition
         })
       },
-      parent_proposition: {type: PropositionGQL}
+      parent: {type: PropositionsParentGQL}
     },
     mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition: propositionData}) => {
       const [id] = await Proposition()
@@ -72,7 +72,7 @@ module.exports = {
       const proposition = Proposition({id});
       return {
         proposition: proposition.first(),
-        parent_proposition: proposition.parent()
+        parent: proposition.parent()
       }
     })
   }),

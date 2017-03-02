@@ -61,18 +61,20 @@ class Form extends React.Component {
   };
 
   render() {
-    const {handleSubmit, onCancel, proposition, submitting, viewer: {user}} = this.props;
+    const {handleSubmit, onCancel, parentID, proposition, submitting, viewer: {user}} = this.props;
     return (
       <Card>
         <form onSubmit={handleSubmit(this.save)}>
 
-          <Field name="type" component={(props) => (
-            <CardSection>
-              <TypeRadio {...props} type="PRO"/>
-              <span style={{padding: '0 4px'}}>|</span>
-              <TypeRadio {...props} type="CONTRA"/>
-            </CardSection>
-          )}/>
+          {parentID && (
+            <Field name="type" component={(props) => (
+              <CardSection>
+                <TypeRadio {...props} type="PRO"/>
+                <span style={{padding: '0 4px'}}>|</span>
+                <TypeRadio {...props} type="CONTRA"/>
+              </CardSection>
+            )}/>
+          )}
 
           <CardTitle>
             <Field component={Input} type="text" name="name"/>
@@ -122,14 +124,14 @@ export default _.flow([
   reduxForm(),
 
   connect(
-    (state, {proposition}) => ({
+    (state, {proposition, parentID}) => ({
       form: 'proposition' + (proposition ? proposition.id : ''),
       initialValues: {
         name: '',
         published: true,
         source_url: '',
         text: '',
-        type: Math.random() > .5 ? 'PRO' : 'CONTRA',
+        type: parentID ? (Math.random() > .5 ? 'PRO' : 'CONTRA') : null,
         ...proposition,
       },
     })

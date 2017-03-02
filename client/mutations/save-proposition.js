@@ -32,7 +32,7 @@ export default class SaveProposition extends Relay.Mutation {
         `
       : Relay.QL`
         fragment on CreatePropositionPayload {
-          parent_proposition {
+          parent {
             propositions
             propositions_count
           }
@@ -52,9 +52,9 @@ export default class SaveProposition extends Relay.Mutation {
       }
       : {
         type: 'RANGE_ADD',
-        parentName: 'parent_proposition',
-        parentID: parent_id,
-        connectionName: 'children',
+        parentName: 'parent',
+        parentID: parent_id || 'viewer',
+        connectionName: 'propositions',
         edgeName: 'proposition_edge',
         rangeBehaviors: {
           '': 'prepend'
