@@ -179,7 +179,10 @@ module.exports = {
     outputFields: {
       viewer: {type: new GraphQLNonNull(ViewerGQL)}
     },
-    mutateAndGetPayload: () => ({viewer: {}})
+    mutateAndGetPayload: (input, req) => {
+      delete req.user_id;
+      return {viewer: {}};
+    }
   })
 
 };

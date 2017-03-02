@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import DocumentTitle from 'react-document-title';
 import Relay from 'react-relay';
 
@@ -6,63 +6,57 @@ import PropositionCard from '../components/proposition-card';
 import PropositionList from '../components/proposition-list';
 
 
-class PropositionPage extends Component {
+const PropositionPage = Relay.createContainer(
+  ({proposition: {id, name, ...proposition}, viewer}) => (
+    <DocumentTitle title={name + ' - Arguably'}><div>
 
-  loadMore = () => {
-    const {relay} = this.props;
-    relay.setVariables({first: relay.variables.first + 10})
-  };
+      <PropositionCard {...{proposition, viewer}} withParent/>
 
-  render() {
-    const {proposition: {id, name, ...proposition}, viewer} = this.props;
-    return (
-      <DocumentTitle title={name + ' - Arguably'}><div>
+      {viewer.user && viewer.user.can_publish && (
+        <PropositionCard proposition={null} parentID={id} viewer={viewer}/>
+      )}
 
-        <PropositionCard {...{proposition, viewer}} withParent/>
+      <PropositionList parent={proposition} viewer={viewer}/>
 
-        {viewer.user && viewer.user.can_publish && (
-          <PropositionCard proposition={null} parentID={id} viewer={viewer}/>
-        )}
+    </div></DocumentTitle>
+  ),
+  {
 
-        <PropositionList parent={proposition} viewer={viewer}/>
+    initialVariables: {first: 20},
 
-      </div></DocumentTitle>
-    );
-  }
+    fragments: {
 
-}
-
-PropositionPage = Relay.createContainer(PropositionPage, {
-
-  initialVariables: {first: 20},
-
-  fragments: {
-
-    proposition: () => Relay.QL`
-      fragment on Proposition {
-        id
-        name
-        ${PropositionCard.getFragment('proposition')}
-        ${PropositionList.getFragment('parent')}
-      }
-    `,
-
-    viewer: () => Relay.QL`
-      fragment on Viewer {
-        user {
-          can_publish
+      proposition: () => Relay.QL`
+        fragment on Proposition {
+          id
+          name
+          ${PropositionCard.getFragment('proposition')}
+          ${PropositionList.getFragment('parent')}
         }
-        ${PropositionCard.getFragment('viewer')}
-        ${PropositionList.getFragment('viewer')}
-      }
-    `
+      `,
+
+      viewer: () => Relay.QL`
+        fragment on Viewer {
+          user {
+            can_publish
+          }
+          ${PropositionCard.getFragment('viewer')}
+          ${PropositionList.getFragment('viewer')}
+        }
+      `
+
+    }
 
   }
-
-});
+);
 
 export default Relay.createContainer(
-  ({node, viewer}) => <PropositionPage proposition={node} viewer={viewer}/>,
+  ({node, viewer}) => {
+    if (!node) {
+      return <div>Not found!</div>
+    }
+    return <PropositionPage proposition={node} viewer={viewer}/>;
+  },
   {
     fragments: {
 

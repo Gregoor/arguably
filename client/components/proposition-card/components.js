@@ -23,16 +23,17 @@ export const PropositionLink = styled(
 export const StatsBar = styled(CardSection)`
   display: flex;
   justify-content: space-between;
-  padding-top: 0;
 `;
 
+export const SourceSection = ({children}) => (
+  <CardSection>
+    <b style={{marginRight: 5}}>Source:</b>
+    {children}
+  </CardSection>
+);
+
 export const TypeTag = styled.span`
-  margin-right: 16px;
   padding-bottom: 0;
   font-weight: bold;
   color: ${(props) => typeColors[props.type] || '#aab8c2'};
-`;
-
-export const TypeTagBar = styled(CardSection)`
-  padding-bottom: 0;
 `;

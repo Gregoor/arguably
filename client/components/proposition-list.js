@@ -6,7 +6,7 @@ import PropositionCard from '../components/proposition-card';
 
 
 export default Relay.createContainer(
-  ({parent: {propositions: {pageInfo, edges}}, viewer, relay}) => (
+  ({parent: {id, propositions: {pageInfo, edges}}, viewer, relay}) => (
     <InfiniteScroll
       hasMore={pageInfo.hasNextPage}
       loadMore={() => {
@@ -14,7 +14,7 @@ export default Relay.createContainer(
       }}
       loader={<div style={{clear: 'both'}}>Loading ...</div>}>
       {edges.map(({node}) => (
-        <PropositionCard key={node.id} proposition={node} viewer={viewer} withStats/>
+        <PropositionCard key={node.id} proposition={node} viewer={viewer} parentID={id}/>
       ))}
     </InfiniteScroll>
   ),
@@ -26,6 +26,7 @@ export default Relay.createContainer(
 
       parent: () => Relay.QL`
         fragment on PropositionsParent {
+          id
           propositions(first: $first) {
             pageInfo {
               hasNextPage

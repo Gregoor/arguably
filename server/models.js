@@ -31,15 +31,15 @@ const ER = {
 /* [[ LIBRARY OUT ]] */
 
 let Proposition = ER.createEntity('propositions', {
-  orderByChildCount() {
-    return knex.with('propositions', (qb) => (
-      qb
-        .select('propositions.*').count('children.id AS child_count')
-        .from('propositions')
-        .leftJoin('propositions AS children', 'children.parent_id', 'propositions.id')
-        .orderBy('child_count', 'DESC').groupBy('propositions.id')
-    )).from('propositions');
-  }
+  forUser: (user) => (
+    knex('propositions').where(function() {
+      if (user) {
+        if (user.can_publish) return;
+        this.where('user_id', user.id);
+      }
+      this.orWhere('published', true)
+    })
+  )
 });
 
 Proposition = ER.createRelations(Proposition, {

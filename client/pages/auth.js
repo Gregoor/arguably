@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
-import Relay from 'react-relay';
 import {connect} from 'react-redux'
+import Relay from 'react-relay';
 import {browserHistory} from 'react-router';
 import {formValueSelector, Field, reduxForm} from 'redux-form';
 
@@ -58,6 +58,7 @@ const AuthPage = ({handleSubmit, invalid, isNew, viewer: user, ...props}) => (
     </CardSection>
   </form></Card>
 );
+
 export default _.flow([
 
   reduxForm({

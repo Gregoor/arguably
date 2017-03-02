@@ -81,7 +81,7 @@
     "dev": "concurrently -p name -n \"server,schema,client\" --kill-others \"yarn run dev-server\" \"yarn run dev-schema\" \"yarn run dev-client\"",
     "dev-server": "nodemon -q --watch server",
     "dev-schema": "nodemon -q --watch server/graphql/ scripts/build-schema.js",
-    "dev-client": "nodemon -q --watch data scripts/start.js",
+    "dev-client": "node scripts/start.js",
     "install": "yarn run build-schema && node scripts/build.js",
     "build-schema": "node scripts/build-schema",
     "prestart": "knex migrate:latest",

@@ -23,7 +23,7 @@ Relay.injectNetworkLayer(new RelayNetworkLayer([
   }),
   loggerMiddleware({
     logger: (text, {relayReqObj}) => {
-      window.np = NProgress;
+      if (!relayReqObj) return;
       NProgress.start();
       relayReqObj.then(() => NProgress.done());
     }
