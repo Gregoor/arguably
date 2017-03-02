@@ -19,7 +19,7 @@ graphql(schema, introspectionQuery).then((result) => {
   const filePath = `${schemaFilePath}.json`;
   const json = JSON.stringify(result, null, 2);
 
-  if (fs.statSync(filePath)) {
+  if (fs.existsSync(filePath)) {
     if (fs.readFileSync(filePath, 'utf-8') != json) {
       console.log(chalk.yellow('Schema changed. You should restart the client process!'));
     } else {
