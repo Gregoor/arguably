@@ -1,18 +1,22 @@
 # Arguably
 
 ## Dependencies
-- PostgreSQL
+- PostgreSQL 9.6
+- [Yarn](https://yarnpkg.com/en/)
 
 ## Installation
 ```commandline
 yarn
-# or
-npm install
-
 cp .env.example .env # Enter your config
 ```
 
 ## Usage
+### Dev
 ```commandline
-npm run start
+yarn run dev
+```
+### Production
+```commandline
+yarn run install
+yarn run start
 ```
