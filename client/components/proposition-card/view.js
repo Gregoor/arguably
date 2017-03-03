@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import {Card, CardSection, CardTitle} from '../ui';
 import {StatsBar, SourceSection, TypeTag} from './components';
 
-import arrows from './ic_compare_arrows_black_24px.svg';
+import compareArrows from './ic_compare_arrows_black_24px.svg';
+import modeEdit from './ic_mode_edit_black_24px.svg';
 
 
 const PropositionLink = ({children, id, ...props}) => (
@@ -40,6 +41,23 @@ const ImageLink = styled(PropositionLink)`
   &:focus, &:hover {
     color: black !important;
     
+    svg {
+      fill: black;  
+    }
+  }
+`;
+
+const ImageButton = styled.button`
+  display: flex;
+  background: none;
+  border: none;
+  cursor: pointer;
+  
+  svg {
+    fill: #aab8c2;  
+  }
+  
+  &:focus, &:hover {
     svg {
       fill: black;  
     }
@@ -83,13 +101,13 @@ export default Relay.createContainer(
 
       <StatsBar>
         <ImageLink id={id} title="Discuss">
-          <span style={{width: 20, marginRight: 4}} dangerouslySetInnerHTML={{__html: arrows}}/>
-          {propositions_count}
+          <span style={{width: 20, marginRight: 4}} dangerouslySetInnerHTML={{__html: compareArrows}}/>
+          {propositions_count || ''}
         </ImageLink>
         {user && (user.can_publish || (!published && author.id)) && (
-          <button type="button" onClick={onEdit}>
-            Edit
-          </button>
+          <ImageButton id={id} title="Edit" type="button" onClick={onEdit}>
+            <span style={{width: 15}} dangerouslySetInnerHTML={{__html: modeEdit}}/>
+          </ImageButton>
         )}
       </StatsBar>
 
