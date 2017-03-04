@@ -68,8 +68,9 @@ let Proposition = ER.createEntity('propositions', {
     })
   ),
   search: (qb, query) => {
-    if (query) qb.where(
-      knex.raw("to_tsvector(name || ' ' || text) @@ to_tsquery(?)", [query.split(' ').map((str) => str + ':*').join(' & ') ])
+    if (query) qb.whereRaw(
+      "to_tsvector(name || ' ' || text) @@ to_tsquery(?)",
+      [query.trim().split(' ').map((str) => str + ':*').join(' & ')]
     );
     return qb;
   }
