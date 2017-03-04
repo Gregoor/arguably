@@ -30,6 +30,8 @@ const TypeRadio = ({input, type}) => {
   );
 };
 
+const FormTextArea = ({input}) => <TextArea {...input}/>
+
 class Form extends React.Component {
 
   static defaultProps = {
@@ -81,7 +83,7 @@ class Form extends React.Component {
           </CardTitle>
 
           <CardSection>
-            <Field component={TextArea} name="text" placeholder="(Optional) extra text"/>
+            <Field component={FormTextArea} name="text" placeholder="(Optional) extra text"/>
           </CardSection>
 
           <CardSection>
