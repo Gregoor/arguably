@@ -56,9 +56,7 @@ export default class SaveProposition extends Relay.Mutation {
         parentID: parent_id || 'viewer',
         connectionName: 'propositions',
         edgeName: 'proposition_edge',
-        rangeBehaviors: {
-          '': 'prepend'
-        }
+        rangeBehaviors: () => 'prepend'
       }
     ];
   }
