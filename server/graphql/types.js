@@ -22,7 +22,7 @@ const {Proposition, User} = require('../models');
 const {resolveWithUser} = require('./resolvers');
 
 
-const knexToConnection = async(baseQuery, {first, after, last, before}) => {
+const knexToConnection = async(baseQuery, orderBy, {first, after, last, before}) => {
   let query = baseQuery.clone();
 
   const offset = parseInt(after, 10) || 0;
@@ -32,14 +32,21 @@ const knexToConnection = async(baseQuery, {first, after, last, before}) => {
     // TODO
   }
 
+  const countQuery = query.clone().count();
+  const totalCountQuery = baseQuery.clone().count();
+
+  if (orderBy) {
+    query.orderBy(...orderBy);
+  }
+
   const [
     nodes,
     [totalCountRow],
     [countRow]
   ] = await Promise.all([
     query.clone(),
-    baseQuery.clone().count(),
-    query.clone().count()
+    totalCountQuery,
+    countQuery
   ]);
 
   const total = totalCountRow ? parseInt(totalCountRow.count, 10) : NaN;
@@ -117,7 +124,7 @@ const PropositionGQL = new GraphQLObjectType({
       type: PropositionConnection,
       args: propositionsArgs,
       resolve: resolveWithUser((user, {id}, args) => (
-        knexToConnection(Proposition.forUserView(user, {parent_id: id}), args)
+        knexToConnection(Proposition.forUserView(user, {parent_id: id}), null, args)
       ))
     },
     propositions_count: {
@@ -162,7 +169,7 @@ const ViewerGQL = new GraphQLObjectType({
         if (args.query) query.where(
           knex.raw("to_tsvector(name || ' ' || text) @@ to_tsquery(?)", [args.query + ':*'])
         );
-        return knexToConnection(query, args);
+        return knexToConnection(query, ['created_at', 'DESC'], args);
       })
     },
     propositions_count: {
