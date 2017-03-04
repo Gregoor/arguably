@@ -4,32 +4,33 @@ import Relay from 'react-relay';
 
 import PropositionCard from '../components/proposition-card';
 import PropositionList from '../components/proposition-list';
+import Search from '../components/search';
 
 
 export default Relay.createContainer(
   ({viewer, relay}) => (
     <DocumentTitle title="Arguably"><div>
 
-      {viewer.user && (
-        <PropositionCard proposition={null} viewer={viewer}/>
-      )}
+      <Search onChange={({target}) => relay.setVariables({query: target.value})}/>
 
-      <PropositionList parent={viewer} viewer={viewer}/>
+      {viewer.user && <PropositionCard proposition={null} viewer={viewer}/>}
+
+      <PropositionList parent={viewer} viewer={viewer} query={relay.variables.query}/>
 
     </div></DocumentTitle>
   ),
   {
 
-    initialVariables: {first: 20},
+    initialVariables: {query: ''},
 
-    fragments: {viewer: () => Relay.QL`
+    fragments: {viewer: (vars) => Relay.QL`
       fragment on Viewer {
         user {
           id
         }
         ${PropositionCard.getFragment('viewer')}
-        ${PropositionList.getFragment('parent')}
-        ${PropositionList.getFragment('viewer')}
+        ${PropositionList.getFragment('parent', {query: vars.query})}
+        ${PropositionList.getFragment('viewer', {query: vars.query})}
       }
     `}
 

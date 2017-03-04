@@ -8,7 +8,7 @@ import {applyRouterMiddleware, browserHistory, IndexRoute, Router, Route} from '
 import useRelay from 'react-router-relay';
 
 import store from './store';
-import Layout from './layout';
+import Layout from './components/layout';
 import logout from './logout';
 
 import AuthPage from './pages/auth';

@@ -17,6 +17,7 @@ const {
 } = require('graphql-relay');
 const _ = require('lodash');
 
+const knex = require('../knex');
 const {Proposition, User} = require('../models');
 const {resolveWithUser} = require('./resolvers');
 
@@ -80,13 +81,15 @@ const UserGQL = new GraphQLObjectType({
   }
 });
 
+const propositionsArgs = Object.assign({query: {type: GraphQLString}}, connectionArgs);
+
 const PropositionsParentGQL = new GraphQLInterfaceType({
   name: 'PropositionsParent',
   fields: () => ({
     id: {type: new GraphQLNonNull(GraphQLID)},
     propositions: {
       type: PropositionConnection,
-      args: connectionArgs
+      args: propositionsArgs
     },
     propositions_count: {type: new GraphQLNonNull(GraphQLInt)}
   }),
@@ -112,7 +115,7 @@ const PropositionGQL = new GraphQLObjectType({
     },
     propositions: {
       type: PropositionConnection,
-      args: connectionArgs,
+      args: propositionsArgs,
       resolve: resolveWithUser((user, {id}, args) => (
         knexToConnection(Proposition.forUserView(user, {parent_id: id}), args)
       ))
@@ -153,10 +156,14 @@ const ViewerGQL = new GraphQLObjectType({
     },
     propositions: {
       type: new GraphQLNonNull(PropositionConnection),
-      args: connectionArgs,
-      resolve: resolveWithUser((user, viewer, args) => (
-        knexToConnection(Proposition.forUserView(user).where('parent_id', null), args)
-      ))
+      args: propositionsArgs,
+      resolve: resolveWithUser((user, viewer, args) => {
+        const query = Proposition.forUserView(user).where('parent_id', null);
+        if (args.query) query.where(
+          knex.raw("to_tsvector(name || ' ' || text) @@ to_tsquery(?)", [args.query + ':*'])
+        );
+        return knexToConnection(query, args);
+      })
     },
     propositions_count: {
       type: new GraphQLNonNull(GraphQLInt),

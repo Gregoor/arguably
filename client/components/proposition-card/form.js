@@ -7,8 +7,8 @@ import styled from 'styled-components';
 
 import DeletePropositionMutation from '../../mutations/delete-proposition';
 import SavePropositionMutation from '../../mutations/save-proposition';
-import {Card, CardSection, CardTitle, Input} from '../ui';
-import {StatsBar, SourceSection, TypeTag} from './components';
+import {Card, CardSection, CardTitle, Input, TextArea} from '../ui';
+import {StatsBar, TypeTag} from './components';
 
 
 const InvisibleInput = styled.input`
@@ -81,13 +81,12 @@ class Form extends React.Component {
           </CardTitle>
 
           <CardSection>
-            <Field component="textarea" name="text" style={{width: '100%'}}
-                   placeholder="(Optional) extra text"/>
+            <Field component={TextArea} name="text" placeholder="(Optional) extra text"/>
           </CardSection>
 
-          <SourceSection>
-            <Field component={Input} name="source_url" type="text" label="Source URL"/>
-          </SourceSection>
+          <CardSection>
+            <Field component={Input} name="source_url" type="text" label="(OptionaL) Source URL"/>
+          </CardSection>
 
           {user.can_publish && (
             <CardSection>

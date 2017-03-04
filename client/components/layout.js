@@ -4,9 +4,8 @@ import Relay from 'react-relay';
 import {Link} from 'react-router';
 import styled from 'styled-components';
 
-import logout from './logout'
-import store from './store';
-
+import logout from '../logout'
+import store from '../store';
 
 const PageContainer = styled.div`
   margin: 0 auto;

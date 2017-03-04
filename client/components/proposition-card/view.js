@@ -4,7 +4,7 @@ import {Link} from 'react-router';
 import styled from 'styled-components';
 
 import {Card, CardSection, CardTitle} from '../ui';
-import {StatsBar, SourceSection, TypeTag} from './components';
+import {StatsBar, TypeTag} from './components';
 
 import compareArrows from './ic_compare_arrows_black_24px.svg';
 import modeEdit from './ic_mode_edit_black_24px.svg';
@@ -63,6 +63,13 @@ const ImageButton = styled.button`
     }
   }
 `;
+
+const SourceSection = ({children}) => (
+  <CardSection>
+    <b style={{marginRight: 5}}>Source:</b>
+    {children}
+  </CardSection>
+);
 
 export default Relay.createContainer(
   ({

@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, {injectGlobal} from 'styled-components';
+import styled, {css, injectGlobal} from 'styled-components';
 
 // eslint-disable-next-line
 injectGlobal`
@@ -10,9 +10,9 @@ injectGlobal`
     min-height: 100%;
     margin: 0;
   }
-  html, body {
+  html, body, input, textarea {
     font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 20px;
   }
@@ -62,8 +62,19 @@ export const CardTitle = styled.h3`
   text-decoration: none;
 `;
 
-export const FullWidthInput = styled.input`
+const inputChunk = css`
+  border-radius: 2px;
+  border: lightgrey 1px solid;
+  padding: 8px 16px;
   width: 100%;
+`;
+
+export const FullWidthInput = styled.input`
+  ${inputChunk}
+`;
+
+export const TextArea = styled.textarea`
+  ${inputChunk}
 `;
 
 export const typeColors = {
@@ -72,7 +83,7 @@ export const typeColors = {
 };
 
 export const Input = ({input, label, type, meta: {touched, error, warning}}) => (
-  <div style={{width: '100%'}}>
+  <div style={{display: 'flex', width: '100%'}}>
     <FullWidthInput {...input} type={type} placeholder={label}/>
     {touched && error && <div style={{color: typeColors.CONTRA}}>{error}</div>}
   </div>
