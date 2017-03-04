@@ -139,7 +139,7 @@ export default _.flow([
         published: true,
         source_url: '',
         text: '',
-        type: 'PRO',
+        type: parentID ? 'PRO' : null,
         ...proposition
       }
     })
