@@ -165,10 +165,9 @@ const ViewerGQL = new GraphQLObjectType({
       type: new GraphQLNonNull(PropositionConnection),
       args: propositionsArgs,
       resolve: resolveWithUser((user, viewer, args) => {
-        const query = Proposition.forUserView(user).where('parent_id', null);
-        if (args.query) query.where(
-          knex.raw("to_tsvector(name || ' ' || text) @@ to_tsquery(?)", [args.query + ':*'])
-        );
+        const query = Proposition.forUserView(user)
+          .search(args.query)
+          .where('parent_id', null);
         return knexToConnection(query, ['created_at', 'DESC'], args);
       })
     },
