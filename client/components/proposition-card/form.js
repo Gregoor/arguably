@@ -63,57 +63,62 @@ class Form extends React.Component {
   };
 
   render() {
-    const {handleSubmit, onCancel, parentID, proposition, submitting, viewer: {user}} = this.props;
-    console.log(this.props)
+    const {
+      dirty, handleSubmit, onCancel, parentID, proposition, submitting, viewer: {user}
+    } = this.props;
     return (
       <Card>
         <form onSubmit={handleSubmit(this.save)}>
-
-          {parentID && (
-            <Field name="type" component={(props) => (
-              <CardSection>
-                <TypeRadio {...props} type="PRO"/>
-                <span style={{padding: '0 4px'}}>|</span>
-                <TypeRadio {...props} type="CONTRA"/>
-              </CardSection>
-            )}/>
-          )}
 
           <CardTitle>
             <Field component={Input} type="text" name="name" label="Make a concise argument"/>
           </CardTitle>
 
-          <CardSection>
-            <Field component={FormTextArea} name="text" label="(Optional) extra text"/>
-          </CardSection>
+          <div style={{display: (proposition || dirty) ? 'block' : 'none'}}>
 
-          <CardSection>
-            <Field component={Input} name="source_url" type="text" label="(OptionaL) Source URL"/>
-          </CardSection>
-
-          {user.can_publish && (
             <CardSection>
-              <label>
-                <Field component="input" name="published" type="checkbox"/>
-                Published
-              </label>
+              <Field component={FormTextArea} name="text" label="(Optional) extra text"/>
             </CardSection>
-          )}
 
-          <StatsBar>
-            <div/>
-            <div>
-              {proposition && [
-                <button key="cancel" type="button" onClick={onCancel}>Cancel</button>,
-                (user.can_publish || (!proposition.published && proposition.user.id)) && (
-                  <button key="delete" type="button" onClick={this.del}>Delete</button>
-                )
-              ]}
-              <button key="save" type="submit" disabled={submitting}>
-                {proposition ? 'Save' : 'Create'}
-              </button>
-            </div>
-          </StatsBar>
+            <CardSection>
+              <Field component={Input} name="source_url" type="text" label="(OptionaL) Source URL"/>
+            </CardSection>
+
+            {parentID && (
+              <Field name="type" component={(props) => (
+                <CardSection>
+                  <TypeRadio {...props} type="PRO"/>
+                  <span style={{padding: '0 4px'}}>|</span>
+                  <TypeRadio {...props} type="CONTRA"/>
+                </CardSection>
+              )}/>
+            )}
+
+            {user.can_publish && (
+              <CardSection>
+                <label>
+                  <Field component="input" name="published" type="checkbox"/>
+                  Published
+                </label>
+              </CardSection>
+            )}
+
+            <StatsBar>
+              <div/>
+              <div>
+                {proposition && [
+                  <button key="cancel" type="button" onClick={onCancel}>Cancel</button>,
+                  (user.can_publish || (!proposition.published && proposition.user.id)) && (
+                    <button key="delete" type="button" onClick={this.del}>Delete</button>
+                  )
+                ]}
+                <button key="save" type="submit" disabled={submitting}>
+                  {proposition ? 'Save' : 'Create'}
+                </button>
+              </div>
+            </StatsBar>
+
+          </div>
 
         </form>
       </Card>
@@ -134,9 +139,9 @@ export default _.flow([
         published: true,
         source_url: '',
         text: '',
-        type: parentID ? (Math.random() > .5 ? 'PRO' : 'CONTRA') : null,
-        ...proposition,
-      },
+        type: 'PRO',
+        ...proposition
+      }
     })
   ),
 
