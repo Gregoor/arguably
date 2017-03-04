@@ -30,7 +30,7 @@ const TypeRadio = ({input, type}) => {
   );
 };
 
-const FormTextArea = ({input}) => <TextArea {...input}/>
+const FormTextArea = ({input, label}) => <TextArea {...input} placeholder={label}/>
 
 class Form extends React.Component {
 
@@ -64,6 +64,7 @@ class Form extends React.Component {
 
   render() {
     const {handleSubmit, onCancel, parentID, proposition, submitting, viewer: {user}} = this.props;
+    console.log(this.props)
     return (
       <Card>
         <form onSubmit={handleSubmit(this.save)}>
@@ -83,7 +84,7 @@ class Form extends React.Component {
           </CardTitle>
 
           <CardSection>
-            <Field component={FormTextArea} name="text" placeholder="(Optional) extra text"/>
+            <Field component={FormTextArea} name="text" label="(Optional) extra text"/>
           </CardSection>
 
           <CardSection>
