@@ -56,11 +56,12 @@ const SourceSection = ({children}) => (
 
 export default Relay.createContainer(
   ({
-    onEdit,
     proposition: {
       user: author, id, name, propositions_count, published, parent, source_url, text, type
     },
-    viewer: {user}
+    viewer: {user},
+    onEdit,
+    showType
   }) => (
     <div>
       {!published && (
@@ -69,7 +70,7 @@ export default Relay.createContainer(
         </CardSection>
       )}
 
-      {type && (
+      {showType && type && (
         <CardSection>
           <TypeTag {...{type}}>{type}</TypeTag>
         </CardSection>

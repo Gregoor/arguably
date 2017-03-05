@@ -10,13 +10,16 @@ const PropositionPage = Relay.createContainer(
   ({proposition: {id, name, ...proposition}, viewer}) => (
     <DocumentTitle title={name + ' - Arguably'}><div>
 
-      <PropositionCard {...{proposition, viewer}} withParent/>
+      <PropositionCard {...{proposition, viewer}} withParent showType={true}/>
 
       {viewer.user && (
         <PropositionCard proposition={null} parentID={id} viewer={viewer} withParent/>
       )}
 
-      <PropositionList parent={proposition} viewer={viewer} withParent={false}/>
+      <PropositionList parent={proposition} viewer={viewer} withParent={false} cardProps={{
+        hideParent: true,
+        showType: true
+      }}/>
 
     </div></DocumentTitle>
   ),

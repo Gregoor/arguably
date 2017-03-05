@@ -38,12 +38,18 @@ class Form extends React.Component {
     onCancel: _.noop
   };
 
-  save = (values) => {
+  getParentID = () => {
     const {parentID, proposition} = this.props;
-    const {id} = proposition || {};
+    const {parent} = proposition || {};
+    return parent ? parent.id : parentID;
+  };
+
+  save = (values) => {
+    const {id} = this.props.proposition || {};
 
     const data = {id, ..._.pick(values, 'name', 'source_url', 'published', 'text', 'type')};
-    if (parentID && parentID !== 'viewer') {
+    const parentID = this.getParentID();
+    if (parentID) {
       data.parent_id = parentID;
     }
     return new Promise((resolve) => Relay.Store.commitUpdate(new SavePropositionMutation(data), {
@@ -64,7 +70,7 @@ class Form extends React.Component {
 
   render() {
     const {
-      dirty, handleSubmit, onCancel, parentID, proposition, submitting, viewer: {user}
+      dirty, handleSubmit, onCancel, proposition, submitting, viewer: {user}
     } = this.props;
     return (
       <div>
@@ -84,7 +90,7 @@ class Form extends React.Component {
               <Field component={Input} name="source_url" type="text" label="(OptionaL) Source URL"/>
             </CardSection>
 
-            {parentID && (
+            {this.getParentID() && (
               <Field name="type" component={(props) => (
                 <CardSection>
                   <TypeRadio {...props} type="PRO"/>
@@ -158,6 +164,9 @@ export default _.flow([
           text
           type
           user {
+            id
+          }
+          parent {
             id
           }
         }

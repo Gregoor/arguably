@@ -9,7 +9,7 @@ export const Card = styled.div`
   box-sizing: border-box;
   border-radius: 2px;
   margin-bottom: 16px;
-  padding: 8px 16px;
+  padding: 8px 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -22,7 +22,7 @@ export const Card = styled.div`
 export const CardSection = styled.div`
   display: flex;
   margin: 0;
-  padding: 8px 0;
+  padding: 8px 16px;
   line-height: 18px;
   overflow: hidden;
   color: rgba(0, 0, 0, .8);
@@ -36,7 +36,7 @@ export const CardTitle = styled.h3`
   display: flex;
   justify-content: stretch;
   line-height: normal;
-  padding: 8px 0;
+  padding: 8px 16px;
   perspective-origin: 165px 56px;
   transform-origin: 165px 56px;
   box-sizing: border-box;

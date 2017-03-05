@@ -15,7 +15,8 @@ export default Relay.createContainer(
 
       {viewer.user && <PropositionCard proposition={null} viewer={viewer}/>}
 
-      <PropositionList parent={viewer} viewer={viewer} query={relay.variables.query} withParent/>
+      <PropositionList parent={viewer} viewer={viewer} query={relay.variables.query} withParent
+                       cardProps={{showType: true}}/>
     </div>
     </DocumentTitle>
   ),

@@ -1,61 +1,16 @@
 import React from 'react';
 import Relay from 'react-relay';
+import styled from 'styled-components';
 
-import {TypeTag} from './components';
 import Form from './form';
-import {Card, CardSection, CardTitle, PropositionTitleLink} from '../ui';
+import {Card, CardSection} from '../ui';
 import View from './view';
 
+const Separator = styled.hr`
+  border-color: rgba(0,0,0,.05);
+`;
 
-const ParentProposition = Relay.createContainer(
-  ({proposition: {id, name, type, has_parent, parent}, relay}) => (
-    <div>
-      {has_parent && (
-        relay.variables.withParent
-          ? (
-            <div>
-              <ParentProposition proposition={parent}/>
-              <CardSection>
-                <TypeTag {...{type}}>{type}</TypeTag>
-              </CardSection>
-            </div>
-          )
-          : (
-            <CardSection style={{cursor: 'pointer'}}
-                         onClick={() => relay.setVariables({withParent: true})}>
-              <b>...</b>
-            </CardSection>
-          )
-      )}
-      <CardTitle><PropositionTitleLink id={id} style={{opacity: .5}}>
-        {name}
-      </PropositionTitleLink></CardTitle>
-    </div>
-  ),
-  {
-
-    initialVariables: {withParent: false},
-
-    fragments: {
-
-      proposition: (vars) => Relay.QL`
-        fragment on Proposition {
-          id
-          name
-          type
-          has_parent
-          parent {
-            ${ParentProposition.getFragment('proposition').if(vars.withParent)}
-          }
-        }
-      `
-
-    }
-
-  }
-);
-
-export default Relay.createContainer(
+const Content = Relay.createContainer(
   class extends React.Component {
 
     state = {
@@ -67,16 +22,29 @@ export default Relay.createContainer(
     };
 
     render() {
-      const {props, state} = this;
-      const {proposition, relay: {variables: {withParent}}} = props;
-      const {parent} = proposition || {};
+      const {relay, parentID, proposition, viewer, hideParent, showType} = this.props;
+      const {withParent} = relay.variables;
+      const {has_parent, parent} = proposition || {};
 
-      const Component = !proposition || state.isEditing ? Form : View;
       return (
-        <Card>
-          {withParent && parent && <ParentProposition proposition={parent}/>}
-          <Component {...props} onEdit={this.toggleIsEditing} onCancel={this.toggleIsEditing}/>
-        </Card>
+        <div>
+          {!hideParent && has_parent && [
+            withParent
+              ? <Content key="content" proposition={parent} viewer={viewer} withParent={false}/>
+              : (
+                <CardSection key="loader" style={{cursor: 'pointer'}}
+                             onClick={() => relay.setVariables({withParent: true})}>
+                  <b>...</b>
+                </CardSection>
+              ),
+            <Separator key="separator"/>
+          ]}
+          {!proposition || this.state.isEditing
+            ? <Form {...{proposition, viewer, parentID}} onCancel={this.toggleIsEditing}/>
+            : <View {...{proposition, viewer}} showType={showType || withParent}
+                    onEdit={this.toggleIsEditing}/>
+          }
+        </div>
       );
     }
 
@@ -89,16 +57,18 @@ export default Relay.createContainer(
 
       proposition: (vars) => Relay.QL`
         fragment on Proposition {
+          has_parent
           parent {
-            ${ParentProposition.getFragment('proposition').if(vars.withParent)}
+            ${Content.getFragment('proposition', {withParent: false}).if(vars.withParent)}
           }
           ${Form.getFragment('proposition')}
           ${View.getFragment('proposition')}
         }
       `,
 
-      viewer: () => Relay.QL`
+      viewer: (vars) => Relay.QL`
         fragment on Viewer {
+          ${Content.getFragment('viewer', {withParent: false}).if(vars.withParent)}
           ${Form.getFragment('viewer')}
           ${View.getFragment('viewer')}
         }
@@ -108,3 +78,25 @@ export default Relay.createContainer(
 
   }
 );
+
+export default Relay.createContainer((props) => <Card><Content {...props}/></Card>, {
+
+  initialVariables: {withParent: false},
+
+  fragments: {
+
+    proposition: (vars) => Relay.QL`
+      fragment on Proposition {
+        ${Content.getFragment('proposition', vars)}
+      }
+    `,
+
+    viewer: (vars) => Relay.QL`
+      fragment on Viewer {
+        ${Content.getFragment('viewer', vars)}
+      }
+    `
+
+  }
+
+});
