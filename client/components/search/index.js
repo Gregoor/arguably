@@ -8,7 +8,7 @@ import searchIcon from './ic_search_black_24px.svg';
 const Container = styled.div`
   position: relative;
   display: flex;
-  padding: 16px 0;
+  padding-bottom: 16px;
 `;
 
 const Input = styled(FullWidthInput)`

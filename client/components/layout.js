@@ -13,20 +13,34 @@ const PageContainer = styled.div`
   max-width: 700px;
 `;
 
+const Header = styled.div`
+  margin-bottom: 16px;
+  padding: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const AppTitle = styled.h1`
+  margin: 0;
+  position: absolute;
+  font-variant: small-caps;
+  left: 50%;
+  transform: translate(-50%, 0);
+`;
+
 export default Relay.createContainer(
   ({children, viewer: {user}}) => (
     <Provider store={store}><PageContainer>
-      <div style={{
-        marginBottom: 8, padding: 8,
-        display: 'flex', flexDirection: 'row', justifyContent: 'space-between'
-      }}>
+      <Header>
         <Link to="/">View all Propositions</Link>
-        <h1 style={{margin: 0, fontVariant: 'small-caps'}}>Arguably</h1>
+        <AppTitle>Arguably</AppTitle>
         {user
           ? <div>Logged in as <b>{user.name}</b> (<a href="#" onClick={logout}>Logout</a>)</div>
           : <Link href="/auth">Login/Register</Link>
         }
-      </div>
+      </Header>
       {children}
     </PageContainer></Provider>
   ),
