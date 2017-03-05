@@ -1,30 +1,13 @@
 import React from 'react';
 import Relay from 'react-relay';
-import {Link} from 'react-router';
 import styled from 'styled-components';
 
-import {Card, CardSection, CardTitle} from '../ui';
+import {CardSection, CardTitle, PropositionLink, PropositionTitleLink} from '../ui';
 import {StatsBar, TypeTag} from './components';
 
 import compareArrows from './ic_compare_arrows_black_24px.svg';
 import modeEdit from './ic_mode_edit_black_24px.svg';
 
-
-const PropositionLink = ({children, id, ...props}) => (
-  <Link to={`/proposition/${id}`} {...props}>
-    {children}
-  </Link>
-);
-
-const PropositionTitleLink = styled(PropositionLink)`
-  color: black !important;
-  text-decoration: none;
-  
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-`;
 
 const ImageLink = styled(PropositionLink)`
   display: flex;
@@ -77,20 +60,13 @@ export default Relay.createContainer(
     proposition: {
       user: author, id, name, propositions_count, published, parent, source_url, text, type
     },
-    viewer: {user},
-    withParent
+    viewer: {user}
   }) => (
-    <Card>
+    <div>
       {!published && (
         <CardSection style={{color: '#FFC107'}}>
           This proposition still needs to be verified by admins before it will be published.
         </CardSection>
-      )}
-
-      {withParent && parent && (
-        <CardTitle><PropositionTitleLink id={parent.id} style={{opacity: .5}}>
-          {parent.name}
-        </PropositionTitleLink></CardTitle>
       )}
 
       {type && (
@@ -118,7 +94,7 @@ export default Relay.createContainer(
         )}
       </StatsBar>
 
-    </Card>
+    </div>
   ),
   {
 
@@ -128,10 +104,6 @@ export default Relay.createContainer(
         fragment on Proposition {
           id
           name
-          parent {
-            id
-            name
-          }
           propositions_count
           published
           source_url

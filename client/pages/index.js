@@ -15,10 +15,9 @@ export default Relay.createContainer(
 
       {viewer.user && <PropositionCard proposition={null} viewer={viewer}/>}
 
-      <PropositionList parent={viewer} viewer={viewer} query={relay.variables.query}
-                              propositionCardProps={{withParent: true}}/>
-
-    </div></DocumentTitle>
+      <PropositionList parent={viewer} viewer={viewer} query={relay.variables.query} withParent/>
+    </div>
+    </DocumentTitle>
   ),
   {
 
@@ -29,9 +28,9 @@ export default Relay.createContainer(
         user {
           id
         }
-        ${PropositionCard.getFragment('viewer')}
-        ${PropositionList.getFragment('parent', {query: vars.query})}
-        ${PropositionList.getFragment('viewer', {query: vars.query})}
+        ${PropositionCard.getFragment('viewer', {withParent: false})}
+        ${PropositionList.getFragment('parent', {query: vars.query, withParent: true})}
+        ${PropositionList.getFragment('viewer', {query: vars.query, withParent: true})}
       }
     `}
 

@@ -1,26 +1,7 @@
 import React from 'react';
-import styled, {css, injectGlobal} from 'styled-components';
+import {Link} from 'react-router';
+import styled, {css} from 'styled-components';
 
-// eslint-disable-next-line
-injectGlobal`
-  html > body {
-    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
-    background-color: #FAFAFA;
-    width: 100%;
-    min-height: 100%;
-    margin: 0;
-  }
-  html, body, input, textarea {
-    font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 20px;
-  }
-  
-  a:-webkit-any-link {
-    color: #1976D2;
-  }
-`;
 
 export const Card = styled.div`
   position: relative;
@@ -71,6 +52,22 @@ const inputChunk = css`
 
 export const FullWidthInput = styled.input`
   ${inputChunk}
+`;
+
+export const PropositionLink = ({children, id, ...props}) => (
+  <Link to={`/proposition/${id}`} {...props}>
+    {children}
+  </Link>
+);
+
+export const PropositionTitleLink = styled(PropositionLink)`
+  color: black !important;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
 `;
 
 export const TextArea = styled.textarea`

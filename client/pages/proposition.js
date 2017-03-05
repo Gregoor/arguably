@@ -13,16 +13,14 @@ const PropositionPage = Relay.createContainer(
       <PropositionCard {...{proposition, viewer}} withParent/>
 
       {viewer.user && (
-        <PropositionCard proposition={null} parentID={id} viewer={viewer}/>
+        <PropositionCard proposition={null} parentID={id} viewer={viewer} withParent/>
       )}
 
-      <PropositionList parent={proposition} viewer={viewer}/>
+      <PropositionList parent={proposition} viewer={viewer} withParent={false}/>
 
     </div></DocumentTitle>
   ),
   {
-
-    initialVariables: {first: 20},
 
     fragments: {
 
@@ -30,8 +28,8 @@ const PropositionPage = Relay.createContainer(
         fragment on Proposition {
           id
           name
-          ${PropositionCard.getFragment('proposition')}
-          ${PropositionList.getFragment('parent')}
+          ${PropositionCard.getFragment('proposition', {withParent: true})}
+          ${PropositionList.getFragment('parent', {withParent: false})}
         }
       `,
 
@@ -40,8 +38,8 @@ const PropositionPage = Relay.createContainer(
           user {
             can_publish
           }
-          ${PropositionCard.getFragment('viewer')}
-          ${PropositionList.getFragment('viewer')}
+          ${PropositionCard.getFragment('viewer', {withParent: true})}
+          ${PropositionList.getFragment('viewer', {withParent: false})}
         }
       `
 

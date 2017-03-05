@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import DeletePropositionMutation from '../../mutations/delete-proposition';
 import SavePropositionMutation from '../../mutations/save-proposition';
-import {Card, CardSection, CardTitle, Input, TextArea} from '../ui';
+import {CardSection, CardTitle, Input, TextArea} from '../ui';
 import {StatsBar, TypeTag} from './components';
 
 
@@ -67,7 +67,7 @@ class Form extends React.Component {
       dirty, handleSubmit, onCancel, parentID, proposition, submitting, viewer: {user}
     } = this.props;
     return (
-      <Card>
+      <div>
         <form onSubmit={handleSubmit(this.save)}>
 
           <CardTitle>
@@ -121,7 +121,7 @@ class Form extends React.Component {
           </div>
 
         </form>
-      </Card>
+      </div>
     );
   }
 

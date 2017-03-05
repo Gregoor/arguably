@@ -116,6 +116,10 @@ const PropositionGQL = new GraphQLObjectType({
   fields: () => ({
     id: globalIdField(),
     name: {type: new GraphQLNonNull(GraphQLString)},
+    has_parent: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      resolve: (proposition) => Boolean(proposition.parent_id)
+    },
     parent: {
       type: PropositionGQL,
       resolve: ({id}) => Proposition({id}).parent()

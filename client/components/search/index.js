@@ -24,7 +24,7 @@ const Input = styled(FullWidthInput)`
 
 const ImageContainer = styled.span`
   position: absolute;
-  top: 24px;
+  top: 8px;
   right: 16px;
   width: 20px;
 `;

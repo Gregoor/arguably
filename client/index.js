@@ -6,6 +6,7 @@ import Relay from 'react-relay';
 import {RelayNetworkLayer, authMiddleware, loggerMiddleware} from 'react-relay-network-layer';
 import {applyRouterMiddleware, browserHistory, IndexRoute, Router, Route} from 'react-router';
 import useRelay from 'react-router-relay';
+import {injectGlobal} from 'styled-components';
 
 import store from './store';
 import Layout from './components/layout';
@@ -48,6 +49,26 @@ const logoutOnInvalidToken = ({error, props}) => {
   return props && <Layout {...props} />;
 };
 
+// eslint-disable-next-line
+injectGlobal`
+  html > body {
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
+    background-color: #FAFAFA;
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+  html, body, input, textarea {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+  }
+  
+  a:-webkit-any-link {
+    color: #1976D2;
+  }
+`;
 
 ReactDOM.render(
   <Router
