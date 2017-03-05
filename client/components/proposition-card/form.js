@@ -7,8 +7,9 @@ import styled from 'styled-components';
 
 import DeletePropositionMutation from '../../mutations/delete-proposition';
 import SavePropositionMutation from '../../mutations/save-proposition';
-import {CardSection, CardTitle, Input, TextArea} from '../ui';
 import {StatsBar, TypeTag} from './components';
+import {getTypeLabel} from '../../helpers';
+import {CardSection, CardTitle, Input, TextArea} from '../ui';
 
 
 const InvisibleInput = styled.input`
@@ -24,7 +25,7 @@ const TypeRadio = ({input, type}) => {
   const checked = input.value === type;
   return (
     <TypeTag {...{type}} style={checked ? {} : {color: 'lightgrey'}}><ClickLabel>
-      {type}
+      {getTypeLabel(type)}
       <InvisibleInput {...input} type="radio" value={type} checked={checked}/>
     </ClickLabel></TypeTag>
   );

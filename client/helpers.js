@@ -9,6 +9,8 @@ export const getErrors = (t) => {
   return source ? JSON.parse(source.errors[0].message) : null;
 };
 
+export const getTypeLabel = (type) => type === 'PRO' ? 'Agree' : 'Disagree';
+
 export const asSubmissionError = (t, fields) => {
   const errors = getErrors(t);
 

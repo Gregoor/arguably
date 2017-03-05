@@ -2,8 +2,9 @@ import React from 'react';
 import Relay from 'react-relay';
 import styled from 'styled-components';
 
-import {CardSection, CardTitle, PropositionLink, PropositionTitleLink} from '../ui';
 import {StatsBar, TypeTag} from './components';
+import {getTypeLabel} from '../../helpers';
+import {CardSection, CardTitle, PropositionLink, PropositionTitleLink} from '../ui';
 
 import compareArrows from './ic_compare_arrows_black_24px.svg';
 import modeEdit from './ic_mode_edit_black_24px.svg';
@@ -72,7 +73,7 @@ export default Relay.createContainer(
 
       {showType && type && (
         <CardSection>
-          <TypeTag {...{type}}>{type}</TypeTag>
+          <TypeTag {...{type}}>{getTypeLabel(type)}</TypeTag>
         </CardSection>
       )}
 
