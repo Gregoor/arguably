@@ -31,7 +31,7 @@ const TypeRadio = ({input, type}) => {
   );
 };
 
-const FormTextArea = ({input, label}) => <TextArea {...input} placeholder={label}/>
+const FormTextArea = ({input, label}) => <TextArea {...input} placeholder={label}/>;
 
 class Form extends React.Component {
 
@@ -63,10 +63,9 @@ class Form extends React.Component {
   };
 
   del = () => {
-    const {parentID, proposition} = this.props;
-    const {id, name} = proposition;
+    const {id, name} = this.props.proposition;
     if (!confirm(`Do you really want to delete "${name}"?`)) return;
-    Relay.Store.commitUpdate(new DeletePropositionMutation({id, parent_id: parentID}));
+    Relay.Store.commitUpdate(new DeletePropositionMutation({id, parent_id: this.getParentID()}));
   };
 
   render() {

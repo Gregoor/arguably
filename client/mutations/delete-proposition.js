@@ -27,7 +27,7 @@ export default class UpdateProposition extends Relay.Mutation {
     return [{
       type: 'RANGE_DELETE',
       parentName: 'parent',
-      parentID: this.props.parent_id,
+      parentID: this.props.parent_id || 'viewer',
       connectionName: 'propositions',
       deletedIDFieldName: 'id',
       pathToConnection: ['parent', 'propositions']
