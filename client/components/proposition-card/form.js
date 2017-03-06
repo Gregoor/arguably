@@ -31,6 +31,16 @@ const TypeRadio = ({input, type}) => {
   );
 };
 
+const LanguageRadio = ({input, language}) => {
+  const checked = input.value === language.id;
+  return (
+    <label>
+      <input {...input} type="radio" value={language.id} checked={checked}/>
+      {language.name}
+    </label>
+  );
+};
+
 const FormTextArea = ({input, label}) => <TextArea {...input} placeholder={label}/>;
 
 class Form extends React.Component {
@@ -48,7 +58,7 @@ class Form extends React.Component {
   save = (values) => {
     const {id} = this.props.proposition || {};
 
-    const data = {id, ..._.pick(values, 'name', 'source_url', 'published', 'text', 'type')};
+    const data = {id, ...values};
     const parentID = this.getParentID();
     if (parentID) {
       data.parent_id = parentID;
@@ -70,24 +80,24 @@ class Form extends React.Component {
 
   render() {
     const {
-      dirty, handleSubmit, onCancel, proposition, submitting, viewer: {user}
+      dirty, handleSubmit, onCancel, proposition, submitting, viewer: {languages, user}
     } = this.props;
     return (
       <div>
         <form onSubmit={handleSubmit(this.save)}>
 
           <CardTitle>
-            <Field component={Input} type="text" name="name" label="Make a concise argument"/>
+            <Field name="name" component={Input} type="text" label="Make a concise argument"/>
           </CardTitle>
 
           <div style={{display: (proposition || dirty) ? 'block' : 'none'}}>
 
             <CardSection>
-              <Field component={FormTextArea} name="text" label="(Optional) extra text"/>
+              <Field name="text" component={FormTextArea} label="(Optional) extra text"/>
             </CardSection>
 
             <CardSection>
-              <Field component={Input} name="source_url" type="text" label="(OptionaL) Source URL"/>
+              <Field name="source_url" component={Input} type="text" label="(Optional) Source URL"/>
             </CardSection>
 
             {this.getParentID() && (
@@ -100,10 +110,17 @@ class Form extends React.Component {
               )}/>
             )}
 
+            <CardSection>
+              {languages.map((language) => (
+                <Field key={language.id} name="language_id" component={LanguageRadio}
+                       language={language} />
+              ))}
+            </CardSection>
+
             {user.can_publish && (
               <CardSection>
                 <label>
-                  <Field component="input" name="published" type="checkbox"/>
+                  <Field name="published" component="input" type="checkbox"/>
                   Published
                 </label>
               </CardSection>
@@ -138,15 +155,18 @@ export default _.flow([
   reduxForm(),
 
   connect(
-    (state, {proposition, parentID}) => ({
+    (state, {proposition, parentID, viewer}) => ({
       form: 'proposition' + (proposition ? proposition.id : ''),
       initialValues: {
+        language_id: proposition
+          ? proposition.language.id
+          : viewer.languages.find((language) => language.name === 'English').id,
         name: '',
         published: true,
         source_url: '',
         text: '',
         type: parentID ? 'PRO' : null,
-        ...proposition
+        ..._.pick(proposition, 'name', 'published', 'source_url', 'text', 'type')
       }
     })
   ),
@@ -163,6 +183,9 @@ export default _.flow([
           source_url
           text
           type
+          language {
+            id
+          }
           user {
             id
           }
@@ -176,6 +199,10 @@ export default _.flow([
         fragment on Viewer {
           user {
             can_publish
+          }
+          languages {
+            id
+            name
           }
         }
       `

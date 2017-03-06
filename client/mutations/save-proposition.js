@@ -10,11 +10,7 @@ export default class SaveProposition extends Relay.Mutation {
   }
 
   getVariables() {
-    return {
-      proposition: _.pick(this.props,
-        'id', 'name', 'text', 'published', 'parent_id', 'type', 'source_url'
-      )
-    };
+    return {proposition: this.props};
   }
 
   getFatQuery() {

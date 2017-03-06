@@ -8,6 +8,7 @@ const User = createRelations(entities.User, {
 });
 
 const Proposition = createRelations(entities.Proposition, {
+  language: [relationTypes.BELONGS_TO, entities.Language],
   user: [relationTypes.BELONGS_TO, entities.User],
   parent: [relationTypes.BELONGS_TO, entities.Proposition],
   votes: [relationTypes.HAS_MANY, entities.Vote, 'proposition_id']
@@ -19,4 +20,4 @@ const Vote = createRelations(entities.Vote, {
 });
 
 
-module.exports = {Proposition, User, Vote};
+module.exports = Object.assign({}, entities, {Proposition, User, Vote});

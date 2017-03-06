@@ -5,6 +5,7 @@ const {
   GraphQLInputObjectType,
   GraphQLInterfaceType,
   GraphQLInt,
+  GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString
@@ -19,7 +20,7 @@ const {
 const _ = require('lodash');
 
 const knex = require('../knex');
-const {Proposition, Vote, User} = require('../entities');
+const {Language, Proposition, Vote, User} = require('../entities');
 const {resolveWithUser} = require('./resolvers');
 
 
@@ -79,20 +80,27 @@ const {nodeInterface, nodeField} = nodeDefinitions(
   }
 );
 
-const PropositionOrderByGQL = new GraphQLEnumType({
-  name: 'PropositionOrderBy',
-  values: {
-    CREATED_AT: {value: 'created_at'},
-    VOTES: {value: 'votes_count'}
+const LanguageGQL = new GraphQLObjectType({
+  name: 'Language',
+  fields: {
+    id: globalIdField(),
+    name: {type: new GraphQLNonNull(GraphQLString)}
   }
 });
 
 const propositionsArgs = Object.assign({
   query: {type: GraphQLString},
+  languages: {type: new GraphQLList(GraphQLID)},
   order: {type: new GraphQLInputObjectType({
     name: 'PropositionOrder',
     fields: {
-      by: {type: new GraphQLNonNull(PropositionOrderByGQL)},
+      by: {type: new GraphQLNonNull(new GraphQLEnumType({
+        name: 'PropositionOrderBy',
+        values: {
+          CREATED_AT: {value: 'created_at'},
+          VOTES: {value: 'votes_count'}
+        }
+      }))},
       desc: {type: GraphQLBoolean}
     }
   })}
@@ -174,6 +182,10 @@ const PropositionGQL = new GraphQLObjectType({
       resolve: resolveWithUser(async(user, {id}) => (
         Boolean(await Vote({proposition_id: id, user_id: user.id}).first())
       ))
+    },
+    language: {
+      type: new GraphQLNonNull(LanguageGQL),
+      resolve: ({id}) => Proposition({id}).language()
     }
   }),
   interfaces: [nodeInterface, PropositionsParentGQL]
@@ -208,6 +220,10 @@ const ViewerGQL = new GraphQLObjectType({
       resolve: resolveWithUser(async (user) => (
         (await Proposition.forUserView(user).where('parent_id', null).count().first()).count
       ))
+    },
+    languages: {
+      type: new GraphQLNonNull(new GraphQLList(LanguageGQL)),
+      resolve: () => Language()
     }
   },
   interfaces: [nodeInterface, PropositionsParentGQL]

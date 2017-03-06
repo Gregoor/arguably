@@ -29,7 +29,7 @@ const localizeIDs = (data, ...ids) => _.mapValues(data, (value, key) => (
 ));
 
 const processPropositionInput = (input, user) => _.omit(
-  localizeIDs(input, 'parent_id'),
+  localizeIDs(input, 'parent_id', 'language_id'),
   'id',
   !user.can_publish && 'published'
 );
@@ -43,7 +43,8 @@ const PropositionInputGQL = new GraphQLInputObjectType({
     parent_id: {type: GraphQLID},
     type: {type: PropositionTypeGQL},
     source_url: {type: GraphQLString},
-    published: {type: GraphQLBoolean}
+    published: {type: GraphQLBoolean},
+    language_id: {type: new GraphQLNonNull(GraphQLID)}
   }
 });
 

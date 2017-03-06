@@ -2,6 +2,8 @@ const {createEntity} = require('./er');
 const knex = require('../knex');
 
 
+const Language = createEntity('languages');
+
 const Proposition = createEntity('propositions', {
   forUserView: (qb, user, fields = {}) => (
     qb.where(fields).where((qb) => {
@@ -36,6 +38,4 @@ const User = createEntity('users', {
 const Vote = createEntity('votes');
 
 
-
-
-module.exports = {Proposition, User, Vote};
+module.exports = {Language, Proposition, User, Vote};
