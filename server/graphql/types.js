@@ -2,6 +2,7 @@ const {
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLID,
+  GraphQLInputObjectType,
   GraphQLInterfaceType,
   GraphQLInt,
   GraphQLNonNull,
@@ -22,7 +23,7 @@ const {Proposition, Vote, User} = require('../entities');
 const {resolveWithUser} = require('./resolvers');
 
 
-const knexToConnection = async(baseQuery, orderBy, {first, after, last, before}) => {
+const knexToConnection = async(baseQuery, {first, after, last, before, order}) => {
   let query = baseQuery.clone();
 
   const offset = parseInt(after, 10) || 0;
@@ -35,8 +36,8 @@ const knexToConnection = async(baseQuery, orderBy, {first, after, last, before})
   const countQuery = query.clone().count();
   const totalCountQuery = baseQuery.clone().count();
 
-  if (orderBy) {
-    query.orderBy(...orderBy);
+  if (order) {
+    query.orderBy(order.by, order.desc ? 'DESC' : 'ASC');
   }
 
   const [
@@ -78,7 +79,24 @@ const {nodeInterface, nodeField} = nodeDefinitions(
   }
 );
 
-const propositionsArgs = Object.assign({query: {type: GraphQLString}}, connectionArgs);
+const PropositionOrderByGQL = new GraphQLEnumType({
+  name: 'PropositionOrderBy',
+  values: {
+    CREATED_AT: {value: 'created_at'},
+    VOTES: {value: 'votes_count'}
+  }
+});
+
+const propositionsArgs = Object.assign({
+  query: {type: GraphQLString},
+  order: {type: new GraphQLInputObjectType({
+    name: 'PropositionOrder',
+    fields: {
+      by: {type: new GraphQLNonNull(PropositionOrderByGQL)},
+      desc: {type: GraphQLBoolean}
+    }
+  })}
+}, connectionArgs);
 
 const UserGQL = new GraphQLObjectType({
   name: 'User',
@@ -90,7 +108,7 @@ const UserGQL = new GraphQLObjectType({
     propositions: {
       type: PropositionConnection,
       args: propositionsArgs,
-      resolve: ({id}, args) => knexToConnection(User({id}).propositions(), null, args)
+      resolve: ({id}, args) => knexToConnection(User({id}).propositions(), args)
     }
   })
 });
@@ -133,7 +151,7 @@ const PropositionGQL = new GraphQLObjectType({
       type: PropositionConnection,
       args: propositionsArgs,
       resolve: resolveWithUser((user, {id}, args) => (
-        knexToConnection(Proposition.forUserView(user, {parent_id: id}), null, args)
+        knexToConnection(Proposition.forUserView(user, {parent_id: id}), args)
       ))
     },
     propositions_count: {
@@ -150,10 +168,7 @@ const PropositionGQL = new GraphQLObjectType({
       type: new GraphQLNonNull(UserGQL),
       resolve: ({id}) => Proposition({id}).user()
     },
-    votes_count: {
-      type: new GraphQLNonNull(GraphQLInt),
-      resolve: async({id}) => (await Proposition({id}).votes().count())[0].count
-    },
+    votes_count: {type: new GraphQLNonNull(GraphQLInt)},
     voted_by_user: {
       type: new GraphQLNonNull(GraphQLBoolean),
       resolve: resolveWithUser(async(user, {id}) => (
@@ -185,7 +200,7 @@ const ViewerGQL = new GraphQLObjectType({
       resolve: resolveWithUser((user, viewer, args) => {
         const query = Proposition.forUserView(user)
           .search(args.query);
-        return knexToConnection(query, ['created_at', 'DESC'], args);
+        return knexToConnection(query, args);
       })
     },
     propositions_count: {

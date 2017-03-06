@@ -103,7 +103,8 @@ export default Relay.createContainer(
 
       <StatsBar>
         <div style={{display: 'flex', flexDirection: 'row'}}>
-          <ImageButton id={id} title="Upvote" style={{marginRight: 16}}
+          <ImageButton id={id} title={voted_by_user ? 'Undo vote' : 'Upvote'}
+                       style={{marginRight: 16}}
                        onClick={() => vote(proposition)} active={voted_by_user}>
             <ImageWrapper dangerouslySetInnerHTML={{__html: arrowUp}}/>
             <span>{votes_count}</span>

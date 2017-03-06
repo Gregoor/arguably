@@ -9,7 +9,6 @@ const compression = require('compression');
 const cors = require('cors');
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
-const GraphlQLError = require('graphql/error');
 const _ = require('lodash');
 
 const schema = require('./graphql');
@@ -47,9 +46,7 @@ app.use('/graphql', graphqlHTTP((req) => {
           locations: error.locations
         };
       } catch (e) {
-        if (!(error instanceof GraphlQLError.GraphQLError)) {
-          console.error(error);
-        }
+        console.error(error);
         return DEV_MODE
           ? {
             message: error.message,

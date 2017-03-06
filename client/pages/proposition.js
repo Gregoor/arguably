@@ -5,6 +5,7 @@ import Relay from 'react-relay';
 import PropositionCard from '../components/proposition-card';
 import PropositionList from '../components/proposition-list';
 
+const order = {by: 'VOTES', desc: true};
 
 const PropositionPage = Relay.createContainer(
   ({proposition: {id, name, ...proposition}, viewer}) => (
@@ -16,7 +17,7 @@ const PropositionPage = Relay.createContainer(
         <PropositionCard proposition={null} parentID={id} viewer={viewer} withParent/>
       )}
 
-      <PropositionList parent={proposition} viewer={viewer} withParent={false} cardProps={{
+      <PropositionList parent={proposition} {...{viewer, order}} withParent={false} cardProps={{
         hideParent: true,
         showType: true
       }}/>
@@ -32,7 +33,7 @@ const PropositionPage = Relay.createContainer(
           id
           name
           ${PropositionCard.getFragment('proposition', {withParent: true})}
-          ${PropositionList.getFragment('parent', {withParent: false})}
+          ${PropositionList.getFragment('parent', {withParent: false, order})}
         }
       `,
 
@@ -42,7 +43,7 @@ const PropositionPage = Relay.createContainer(
             can_publish
           }
           ${PropositionCard.getFragment('viewer', {withParent: true})}
-          ${PropositionList.getFragment('viewer', {withParent: false})}
+          ${PropositionList.getFragment('viewer', {withParent: false, order})}
         }
       `
 

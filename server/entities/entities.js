@@ -36,4 +36,6 @@ const User = createEntity('users', {
 const Vote = createEntity('votes');
 
 
+
+
 module.exports = {Proposition, User, Vote};

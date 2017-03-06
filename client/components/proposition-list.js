@@ -22,14 +22,16 @@ export default Relay.createContainer(
   ),
   {
 
-    initialVariables: {first: BATCH_SIZE, query: '', withParent: false},
+    initialVariables: {
+      first: BATCH_SIZE, order: {by: 'CREATED_AT', desc: true}, query: '', withParent: false
+    },
 
     fragments: {
 
       parent: (vars) => Relay.QL`
         fragment on PropositionsParent {
           id
-          propositions(first: $first, query: $query) {
+          propositions(first: $first, query: $query, order: $order) {
             pageInfo {
               hasNextPage
             }
