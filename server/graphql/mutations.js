@@ -10,7 +10,7 @@ const {fromGlobalId, mutationWithClientMutationId} = require('graphql-relay');
 const _ = require('lodash');
 
 const {JSONError, jwt} = require('../helpers');
-const {Proposition, User} = require('../models');
+const {Proposition, Vote, User} = require('../entities');
 const {resolveWithRequiredUser} = require('./resolvers');
 const {
   PropositionEdge,
@@ -114,6 +114,44 @@ module.exports = {
         id,
         parent: parent || {id: 'viewer'}
       }
+    })
+  }),
+
+  vote: mutationWithClientMutationId({
+    name: 'Vote',
+    inputFields: {
+      proposition_id: {type: new GraphQLNonNull(GraphQLID)}
+    },
+    outputFields: {
+      proposition: {type: new GraphQLNonNull(PropositionGQL)}
+    },
+    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition_id}) => {
+      proposition_id = localizeID(proposition_id);
+      const voteFields = {proposition_id, user_id: user.id};
+      if (await Vote(voteFields).first()) {
+        throw JSONError({proposition_id: ['already_voted']});
+      }
+      await Vote().insert(voteFields);
+      return {proposition: Proposition({id: proposition_id}).first()};
+    })
+  }),
+
+  unvote: mutationWithClientMutationId({
+    name: 'Unvote',
+    inputFields: {
+      proposition_id: {type: new GraphQLNonNull(GraphQLID)}
+    },
+    outputFields: {
+      proposition: {type: new GraphQLNonNull(PropositionGQL)}
+    },
+    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition_id}) => {
+      proposition_id = localizeID(proposition_id);
+      const voteFields = {proposition_id, user_id: user.id};
+      if (!(await Vote(voteFields).first())) {
+        throw JSONError({proposition_id: ['not_voted']});
+      }
+      await Vote().where(voteFields).del();
+      return {proposition: Proposition({id: proposition_id}).first()};
     })
   }),
 

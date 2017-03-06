@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
 const {JSONError} = require('../helpers');
-const {User} = require('../models');
+const {User} = require('../entities');
 
 
 const resolvers = {

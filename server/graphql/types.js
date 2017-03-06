@@ -18,7 +18,7 @@ const {
 const _ = require('lodash');
 
 const knex = require('../knex');
-const {Proposition, User} = require('../models');
+const {Proposition, Vote, User} = require('../entities');
 const {resolveWithUser} = require('./resolvers');
 
 
@@ -78,17 +78,22 @@ const {nodeInterface, nodeField} = nodeDefinitions(
   }
 );
 
+const propositionsArgs = Object.assign({query: {type: GraphQLString}}, connectionArgs);
+
 const UserGQL = new GraphQLObjectType({
   name: 'User',
-  fields: {
+  fields: () => ({
     id: globalIdField(),
     name: {type: new GraphQLNonNull(GraphQLString)},
     can_vote: {type: new GraphQLNonNull(GraphQLBoolean)},
-    can_publish: {type: new GraphQLNonNull(GraphQLBoolean)}
-  }
+    can_publish: {type: new GraphQLNonNull(GraphQLBoolean)},
+    propositions: {
+      type: PropositionConnection,
+      args: propositionsArgs,
+      resolve: ({id}, args) => knexToConnection(User({id}).propositions(), null, args)
+    }
+  })
 });
-
-const propositionsArgs = Object.assign({query: {type: GraphQLString}}, connectionArgs);
 
 const PropositionsParentGQL = new GraphQLInterfaceType({
   name: 'PropositionsParent',
@@ -143,9 +148,18 @@ const PropositionGQL = new GraphQLObjectType({
     type: {type: PropositionTypeGQL},
     user: {
       type: new GraphQLNonNull(UserGQL),
-      resolve: ({id}) => ({}) || Proposition({id}).user()
+      resolve: ({id}) => Proposition({id}).user()
     },
-    votes: {type: new GraphQLNonNull(GraphQLInt)}
+    votes_count: {
+      type: new GraphQLNonNull(GraphQLInt),
+      resolve: async({id}) => (await Proposition({id}).votes().count())[0].count
+    },
+    voted_by_user: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      resolve: resolveWithUser(async(user, {id}) => (
+        Boolean(await Vote({proposition_id: id, user_id: user.id}).first())
+      ))
+    }
   }),
   interfaces: [nodeInterface, PropositionsParentGQL]
 });

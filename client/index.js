@@ -58,7 +58,7 @@ injectGlobal`
     min-height: 100%;
     margin: 0;
   }
-  html, body, input, textarea {
+  html, body, input, textarea, button  {
     font-family: 'Helvetica', 'Arial', sans-serif;
     font-size: 16px;
     font-weight: 400;
