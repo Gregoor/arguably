@@ -176,7 +176,7 @@ const PropositionGQL = new GraphQLObjectType({
     voted_by_user: {
       type: new GraphQLNonNull(GraphQLBoolean),
       resolve: resolveWithUser(async(user, {id}) => (
-        Boolean(await Vote({proposition_id: id, user_id: user.id}).first())
+        Boolean(user && await Vote({proposition_id: id, user_id: user.id}).first())
       ))
     },
     language: {
