@@ -22,7 +22,7 @@ $vote_stamp$ LANGUAGE plpgsql;
 CREATE TRIGGER refresh_propositions_votes_count AFTER INSERT OR DELETE ON votes
   FOR EACH ROW
   EXECUTE PROCEDURE refresh_propositions_votes_count();
-`);
+`)
 
 exports.down = (knex) => knex.raw(`
 DROP TRIGGER refresh_propositions_votes_count ON votes;
@@ -34,4 +34,4 @@ DROP TABLE votes;
 ALTER TABLE propositions
   DROP COLUMN votes_count,
   ADD COLUMN votes INT NOT NULL DEFAULT 0;
-`);
+`)

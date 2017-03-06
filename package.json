@@ -5,7 +5,6 @@
   "dependencies": {
     "autoprefixer": "6.7.2",
     "babel-core": "6.22.1",
-    "babel-eslint": "7.1.1",
     "babel-jest": "18.0.0",
     "babel-loader": "6.2.10",
     "babel-preset-react-app": "^2.1.1",
@@ -19,13 +18,6 @@
     "cross-spawn": "4.0.2",
     "css-loader": "0.26.1",
     "dotenv": "^4.0.0",
-    "eslint": "3.8.1",
-    "eslint-config-react-app": "^0.5.2",
-    "eslint-loader": "1.6.0",
-    "eslint-plugin-flowtype": "2.21.0",
-    "eslint-plugin-import": "2.0.1",
-    "eslint-plugin-jsx-a11y": "2.2.3",
-    "eslint-plugin-react": "6.4.1",
     "express": "^4.14.1",
     "express-graphql": "^0.6.2",
     "extract-text-webpack-plugin": "1.0.1",
@@ -47,7 +39,6 @@
     "postcss-loader": "1.3.2",
     "promise": "7.1.1",
     "react": "^15.4.1",
-    "react-apollo": "^0.11.2",
     "react-dev-utils": "^0.5.1",
     "react-document-title": "^2.0.2",
     "react-dom": "^15.4.1",
@@ -72,26 +63,40 @@
     "whatwg-fetch": "2.0.2"
   },
   "devDependencies": {
+    "babel-eslint": "7.1.1",
     "concurrently": "^3.3.0",
     "detect-port": "^1.1.0",
+    "eslint": "3.17.0",
+    "eslint-config-react-app": "^0.6.0",
+    "eslint-config-standard": "^7.0.0",
+    "eslint-loader": "1.6.0",
+    "eslint-plugin-flowtype": "2.30.0",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-jsx-a11y": "4.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-react": "6.10.0",
+    "eslint-plugin-standard": "^2.1.1",
     "nodemon": "^1.11.0",
+    "pre-commit": "^1.2.2",
     "webpack-dev-middleware": "^1.10.1"
   },
   "proxy": "http://localhost:4242",
   "scripts": {
-    "dev": "concurrently -p name -n \"server,schema,client\" --kill-others \"yarn run dev-server\" \"yarn run dev-schema\" \"yarn run dev-client\"",
-    "dev-server": "nodemon -q --watch server",
-    "dev-schema": "nodemon -q --watch server/graphql/ scripts/build-schema.js",
-    "dev-client": "node scripts/start.js",
-    "install": "yarn run build-schema && node scripts/build.js",
+    "lint": "eslint .",
     "build-schema": "node scripts/build-schema",
+    "dev-client": "node scripts/start.js",
+    "watch-lint": "nodemon -q --watch client --watch scripts --watch server --exec yarn run lint",
+    "watch-schema": "nodemon -q --watch server/graphql/ --exec yarn run build-schema",
+    "watch-server": "nodemon -q --watch server",
+    "dev": "concurrently -p name -n \"lint,server,schema,client\" --kill-others \"yarn run watch-lint\" \"yarn run watch-server\" \"yarn run watch-schema\" \"yarn run dev-client\"",
+    "install": "yarn run build-schema && node scripts/build.js",
     "prestart": "knex migrate:latest",
     "start": "node server/index.js"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "engines": {
     "node": "7.6.0"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   }
 }

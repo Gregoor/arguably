@@ -19,7 +19,7 @@ COMMIT;
 
 BEGIN;
 ALTER TABLE propositions ALTER COLUMN user_id SET NOT NULL;
-`);
+`)
 
 exports.down = (knex) => knex.raw(`
 ALTER TABLE propositions
@@ -27,4 +27,4 @@ ALTER TABLE propositions
   DROP COLUMN published;
   
 DROP TABLE users;
-`);
+`)

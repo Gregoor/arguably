@@ -1,13 +1,12 @@
-import React from 'react';
-import InfiniteScroll from 'react-infinite-scroller';
-import Relay from 'react-relay';
+import React from 'react'
+import InfiniteScroll from 'react-infinite-scroller'
+import Relay from 'react-relay'
+import PropositionCard from '../components/proposition-card'
 
-import PropositionCard from '../components/proposition-card';
-
-const BATCH_SIZE = 3;
+const BATCH_SIZE = 3
 
 export default Relay.createContainer(
-  ({relay, parent: {id, propositions: {pageInfo, edges}}, viewer, cardProps}) => (
+  ({relay, parent: {propositions: {pageInfo, edges}}, viewer, cardProps}) => (
     <InfiniteScroll
       hasMore={pageInfo.hasNextPage}
       loadMore={() => {
@@ -30,7 +29,6 @@ export default Relay.createContainer(
 
       parent: (vars) => Relay.QL`
         fragment on PropositionsParent {
-          id
           propositions(first: $first, query: $query, order: $order) {
             pageInfo {
               hasNextPage
@@ -54,4 +52,4 @@ export default Relay.createContainer(
     }
 
   }
-);
+)

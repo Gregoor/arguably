@@ -1,19 +1,17 @@
-import Relay from 'react-relay';
-import _ from 'lodash';
+import Relay from 'react-relay'
 
 export default class SaveProposition extends Relay.Mutation {
-
-  getMutation() {
+  getMutation () {
     return this.props.id
       ? Relay.QL`mutation { updateProposition }`
-      : Relay.QL`mutation { createProposition }`;
+      : Relay.QL`mutation { createProposition }`
   }
 
-  getVariables() {
-    return {proposition: this.props};
+  getVariables () {
+    return {proposition: this.props}
   }
 
-  getFatQuery() {
+  getFatQuery () {
     return this.props.id
         ? Relay.QL`
           fragment on UpdatePropositionPayload {
@@ -34,27 +32,26 @@ export default class SaveProposition extends Relay.Mutation {
           }
           proposition_edge
         }
-      `;
+      `
   }
 
-  getConfigs() {
-    const {id, parent_id} = this.props;
+  getConfigs () {
+    const {id, parent_id: parentID} = this.props
     return [id
       ? {
         type: 'FIELDS_CHANGE',
         fieldIDs: {
-          proposition: id,
-        },
+          proposition: id
+        }
       }
       : {
         type: 'RANGE_ADD',
         parentName: 'parent',
-        parentID: parent_id || 'viewer',
+        parentID: parentID || 'viewer',
         connectionName: 'propositions',
         edgeName: 'proposition_edge',
         rangeBehaviors: () => 'prepend'
       }
-    ];
+    ]
   }
-
 }

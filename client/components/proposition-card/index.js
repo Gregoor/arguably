@@ -1,34 +1,32 @@
-import React from 'react';
-import Relay from 'react-relay';
-import styled from 'styled-components';
-
-import Form from './form';
-import {Card, CardSection} from '../ui';
-import View from './view';
+import React from 'react'
+import Relay from 'react-relay'
+import styled from 'styled-components'
+import {Card, CardSection} from '../ui'
+import Form from './form'
+import View from './view'
 
 const Separator = styled.hr`
   border-color: rgba(0,0,0,.05);
-`;
+`
 
 const Content = Relay.createContainer(
   class extends React.Component {
-
     state = {
       isEditing: false
     };
 
     toggleIsEditing = () => {
-      this.setState((state) => ({isEditing: !state.isEditing}));
+      this.setState((state) => ({isEditing: !state.isEditing}))
     };
 
-    render() {
-      const {relay, parentID, proposition, viewer, hideParent, showType} = this.props;
-      const {withParent} = relay.variables;
-      const {has_parent, parent} = proposition || {};
+    render () {
+      const {relay, parentID, proposition, viewer, hideParent, showType} = this.props
+      const {withParent} = relay.variables
+      const {has_parent: hasParent, parent} = proposition || {}
 
       return (
         <div>
-          {!hideParent && has_parent && [
+          {!hideParent && hasParent && [
             withParent
               ? <Content key="content" proposition={parent} viewer={viewer} withParent={false}/>
               : (
@@ -45,9 +43,8 @@ const Content = Relay.createContainer(
                     onEdit={this.toggleIsEditing}/>
           }
         </div>
-      );
+      )
     }
-
   },
   {
 
@@ -77,7 +74,7 @@ const Content = Relay.createContainer(
     }
 
   }
-);
+)
 
 export default Relay.createContainer((props) => <Card><Content {...props}/></Card>, {
 
@@ -99,4 +96,4 @@ export default Relay.createContainer((props) => <Card><Content {...props}/></Car
 
   }
 
-});
+})

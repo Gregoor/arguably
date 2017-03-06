@@ -1,7 +1,6 @@
-import Relay from 'react-relay';
+import Relay from 'react-relay'
 
 export default class Vote extends Relay.Mutation {
-
   static fragments = {
     proposition: () => Relay.QL`
       fragment on Proposition {
@@ -14,15 +13,15 @@ export default class Vote extends Relay.Mutation {
 
   getIsVoted = () => this.props.proposition.voted_by_user;
 
-  getMutation() {
-    return this.getIsVoted() ? Relay.QL`mutation { unvote }` : Relay.QL`mutation { vote }`;
+  getMutation () {
+    return this.getIsVoted() ? Relay.QL`mutation { unvote }` : Relay.QL`mutation { vote }`
   }
 
-  getVariables() {
-    return {proposition_id: this.props.proposition.id};
+  getVariables () {
+    return {proposition_id: this.props.proposition.id}
   }
 
-  getFatQuery() {
+  getFatQuery () {
     return this.getIsVoted()
         ? Relay.QL`
           fragment on UnvotePayload {
@@ -39,26 +38,25 @@ export default class Vote extends Relay.Mutation {
             votes_count
           }
         }
-      `;
+      `
   }
 
-  getConfigs() {
+  getConfigs () {
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
-        proposition: this.props.proposition.id,
-      },
-    }];
+        proposition: this.props.proposition.id
+      }
+    }]
   }
 
-  getOptimisticResponse() {
-    const {voted_by_user, votes_count} = this.props.proposition;
+  getOptimisticResponse () {
+    const {voted_by_user: votedByUser, votes_count: votesCount} = this.props.proposition
     return {
       proposition: {
-        voted_by_user: !voted_by_user,
-        votes_count: votes_count + (voted_by_user ? -1 : 1)
+        voted_by_user: !votedByUser,
+        votes_count: votesCount + (votedByUser ? -1 : 1)
       }
-    };
+    }
   }
-
 }

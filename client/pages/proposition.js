@@ -1,11 +1,10 @@
-import React from 'react';
-import DocumentTitle from 'react-document-title';
-import Relay from 'react-relay';
+import React from 'react'
+import DocumentTitle from 'react-document-title'
+import Relay from 'react-relay'
+import PropositionCard from '../components/proposition-card'
+import PropositionList from '../components/proposition-list'
 
-import PropositionCard from '../components/proposition-card';
-import PropositionList from '../components/proposition-list';
-
-const order = {by: 'VOTES', desc: true};
+const order = {by: 'VOTES', desc: true}
 
 const PropositionPage = Relay.createContainer(
   ({proposition: {id, name, ...proposition}, viewer}) => (
@@ -50,14 +49,14 @@ const PropositionPage = Relay.createContainer(
     }
 
   }
-);
+)
 
 export default Relay.createContainer(
   ({node, viewer}) => {
     if (!node) {
       return <div>Not found!</div>
     }
-    return <PropositionPage proposition={node} viewer={viewer}/>;
+    return <PropositionPage proposition={node} viewer={viewer}/>
   },
   {
     fragments: {
@@ -76,7 +75,4 @@ export default Relay.createContainer(
 
     }
   }
-);
-
-
-
+)

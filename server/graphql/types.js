@@ -9,36 +9,32 @@ const {
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString
-} = require('graphql');
+} = require('graphql')
 const {
   connectionArgs,
   connectionDefinitions,
   fromGlobalId,
   globalIdField,
   nodeDefinitions
-} = require('graphql-relay');
-const _ = require('lodash');
-
-const knex = require('../knex');
-const {Language, Proposition, Vote, User} = require('../entities');
-const {resolveWithUser} = require('./resolvers');
-
+} = require('graphql-relay')
+const {Language, Proposition, Vote, User} = require('../entities')
+const {resolveWithUser} = require('./resolvers')
 
 const knexToConnection = async(baseQuery, {first, after, last, before, order}) => {
-  let query = baseQuery.clone();
+  let query = baseQuery.clone()
 
-  const offset = parseInt(after, 10) || 0;
+  const offset = parseInt(after, 10) || 0
   if (first) {
-    query = query.clone().limit(first).offset(offset);
+    query = query.clone().limit(first).offset(offset)
   } else if (last) {
     // TODO
   }
 
-  const countQuery = query.clone().count();
-  const totalCountQuery = baseQuery.clone().count();
+  const countQuery = query.clone().count()
+  const totalCountQuery = baseQuery.clone().count()
 
   if (order) {
-    query.orderBy(order.by, order.desc ? 'DESC' : 'ASC');
+    query.orderBy(order.by, order.desc ? 'DESC' : 'ASC')
   }
 
   const [
@@ -49,10 +45,10 @@ const knexToConnection = async(baseQuery, {first, after, last, before, order}) =
     query.clone(),
     totalCountQuery,
     countQuery
-  ]);
+  ])
 
-  const total = totalCountRow ? parseInt(totalCountRow.count, 10) : NaN;
-  const isThisAll = total - (countRow ? parseInt(countRow.count, 10) : NaN) > 0;
+  const total = totalCountRow ? parseInt(totalCountRow.count, 10) : NaN
+  const isThisAll = total - (countRow ? parseInt(countRow.count, 10) : NaN) > 0
   return {
     pageInfo: {
       hasNextPage: Boolean(!isThisAll && offset + (first || 0) < total),
@@ -61,24 +57,24 @@ const knexToConnection = async(baseQuery, {first, after, last, before, order}) =
       endCursor: total
     },
     edges: nodes.map((node, i) => ({node, cursor: i}))
-  };
-};
+  }
+}
 
 const {nodeInterface, nodeField} = nodeDefinitions(
   resolveWithUser((user, globalId) => {
-    const {id, type} = fromGlobalId(globalId);
+    const {id, type} = fromGlobalId(globalId)
 
-    if (type == 'Proposition') {
-      return Proposition.forUserView(user, {id}).first();
+    if (type === 'Proposition') {
+      return Proposition.forUserView(user, {id}).first()
     }
 
-    return {};
+    return {}
   }),
   (obj) => {
-    if (obj.id) return PropositionGQL;
-    else return ViewerGQL;
+    if (obj.id) return PropositionGQL
+    else return ViewerGQL
   }
-);
+)
 
 const LanguageGQL = new GraphQLObjectType({
   name: 'Language',
@@ -86,7 +82,7 @@ const LanguageGQL = new GraphQLObjectType({
     id: globalIdField(),
     name: {type: new GraphQLNonNull(GraphQLString)}
   }
-});
+})
 
 const propositionsArgs = Object.assign({
   query: {type: GraphQLString},
@@ -104,7 +100,7 @@ const propositionsArgs = Object.assign({
       desc: {type: GraphQLBoolean}
     }
   })}
-}, connectionArgs);
+}, connectionArgs)
 
 const UserGQL = new GraphQLObjectType({
   name: 'User',
@@ -119,7 +115,7 @@ const UserGQL = new GraphQLObjectType({
       resolve: ({id}, args) => knexToConnection(User({id}).propositions(), args)
     }
   })
-});
+})
 
 const PropositionsParentGQL = new GraphQLInterfaceType({
   name: 'PropositionsParent',
@@ -131,8 +127,8 @@ const PropositionsParentGQL = new GraphQLInterfaceType({
     },
     propositions_count: {type: new GraphQLNonNull(GraphQLInt)}
   }),
-  resolveType: ({id}) => id == 'viewer' ? ViewerGQL : PropositionGQL
-});
+  resolveType: ({id}) => id === 'viewer' ? ViewerGQL : PropositionGQL
+})
 
 const PropositionTypeGQL = new GraphQLEnumType({
   name: 'PropositionType',
@@ -140,7 +136,7 @@ const PropositionTypeGQL = new GraphQLEnumType({
     PRO: {value: 'pro'},
     CONTRA: {value: 'contra'}
   }
-});
+})
 
 const PropositionGQL = new GraphQLObjectType({
   name: 'Proposition',
@@ -164,7 +160,7 @@ const PropositionGQL = new GraphQLObjectType({
     },
     propositions_count: {
       type: new GraphQLNonNull(GraphQLInt),
-      resolve: resolveWithUser(async(user, {id, child_count}) => child_count || (
+      resolve: resolveWithUser(async(user, {id}) => (
         (await Proposition.forUserView(user, {parent_id: id}).count().first()).count
       ))
     },
@@ -189,12 +185,12 @@ const PropositionGQL = new GraphQLObjectType({
     }
   }),
   interfaces: [nodeInterface, PropositionsParentGQL]
-});
+})
 
 const {
   connectionType: PropositionConnection,
   edgeType: PropositionEdge
-} = connectionDefinitions({nodeType: PropositionGQL});
+} = connectionDefinitions({nodeType: PropositionGQL})
 
 const ViewerGQL = new GraphQLObjectType({
   name: 'Viewer',
@@ -202,8 +198,8 @@ const ViewerGQL = new GraphQLObjectType({
     id: {type: new GraphQLNonNull(GraphQLID), resolve: () => 'viewer'},
     user: {
       type: UserGQL,
-      resolve: (viewer, {}, {user_id}) => (
-        viewer.user || (user_id && User().where('id', user_id).first())
+      resolve: (viewer, args, {user_id: id}) => (
+        viewer.user || (id && User().where({id}).first())
       )
     },
     propositions: {
@@ -211,8 +207,8 @@ const ViewerGQL = new GraphQLObjectType({
       args: propositionsArgs,
       resolve: resolveWithUser((user, viewer, args) => {
         const query = Proposition.forUserView(user)
-          .search(args.query);
-        return knexToConnection(query, args);
+          .search(args.query)
+        return knexToConnection(query, args)
       })
     },
     propositions_count: {
@@ -227,8 +223,7 @@ const ViewerGQL = new GraphQLObjectType({
     }
   },
   interfaces: [nodeInterface, PropositionsParentGQL]
-});
-
+})
 
 module.exports = {
   nodeField,
@@ -237,4 +232,4 @@ module.exports = {
   PropositionsParentGQL,
   PropositionTypeGQL,
   ViewerGQL
-};
+}

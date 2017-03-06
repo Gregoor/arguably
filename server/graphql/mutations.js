@@ -1,38 +1,36 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
 const {
   GraphQLID,
   GraphQLBoolean,
   GraphQLInputObjectType,
   GraphQLNonNull,
   GraphQLString
-} = require('graphql');
-const {fromGlobalId, mutationWithClientMutationId} = require('graphql-relay');
-const _ = require('lodash');
-
-const {JSONError, jwt} = require('../helpers');
-const {Proposition, Vote, User} = require('../entities');
-const {resolveWithRequiredUser} = require('./resolvers');
+} = require('graphql')
+const {fromGlobalId, mutationWithClientMutationId} = require('graphql-relay')
+const _ = require('lodash')
+const {JSONError, jwt} = require('../helpers')
+const {Proposition, Vote, User} = require('../entities')
+const {resolveWithRequiredUser} = require('./resolvers')
 const {
   PropositionEdge,
   PropositionGQL,
   PropositionsParentGQL,
   PropositionTypeGQL,
   ViewerGQL
-} = require('./types');
+} = require('./types')
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 10
 
-
-const localizeID = (globalId) => fromGlobalId(globalId).id;
+const localizeID = (globalId) => fromGlobalId(globalId).id
 const localizeIDs = (data, ...ids) => _.mapValues(data, (value, key) => (
   ids.includes(key) ? localizeID(value) : value
-));
+))
 
 const processPropositionInput = (input, user) => _.omit(
   localizeIDs(input, 'parent_id', 'language_id'),
   'id',
   !user.can_publish && 'published'
-);
+)
 
 const PropositionInputGQL = new GraphQLInputObjectType({
   name: 'PropositionInput',
@@ -46,7 +44,7 @@ const PropositionInputGQL = new GraphQLInputObjectType({
     published: {type: GraphQLBoolean},
     language_id: {type: new GraphQLNonNull(GraphQLID)}
   }
-});
+})
 
 module.exports = {
 
@@ -68,9 +66,9 @@ module.exports = {
     mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition: propositionData}) => {
       const [id] = await Proposition()
         .insert(Object.assign(processPropositionInput(propositionData, user), {user_id: user.id}))
-        .returning('id');
+        .returning('id')
 
-      const proposition = Proposition({id});
+      const proposition = Proposition({id})
       return {
         proposition: proposition.first(),
         parent: proposition.parent()
@@ -87,13 +85,13 @@ module.exports = {
       proposition: {type: new GraphQLNonNull(PropositionGQL)}
     },
     mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition: propositionData}) => {
-      const id = localizeID(propositionData.id);
+      const id = localizeID(propositionData.id)
 
       await Proposition
         .forUserChange(user, {id})
-        .update(processPropositionInput(propositionData, user));
+        .update(processPropositionInput(propositionData, user))
 
-      return {proposition: Proposition({id}).first()};
+      return {proposition: Proposition({id}).first()}
     })
   }),
 
@@ -107,9 +105,9 @@ module.exports = {
       parent: {type: new GraphQLNonNull(PropositionsParentGQL)}
     },
     mutateAndGetPayload: resolveWithRequiredUser(async(user, {id}) => {
-      const proposition = Proposition.forUserChange(user, {id: localizeID(id)});
-      const parent = await proposition.parent();
-      await proposition.del();
+      const proposition = Proposition.forUserChange(user, {id: localizeID(id)})
+      const parent = await proposition.parent()
+      await proposition.del()
 
       return {
         id,
@@ -126,14 +124,14 @@ module.exports = {
     outputFields: {
       proposition: {type: new GraphQLNonNull(PropositionGQL)}
     },
-    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition_id}) => {
-      proposition_id = localizeID(proposition_id);
-      const voteFields = {proposition_id, user_id: user.id};
+    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition_id: id}) => {
+      id = localizeID(id)
+      const voteFields = {proposition_id: id, user_id: user.id}
       if (await Vote(voteFields).first()) {
-        throw JSONError({proposition_id: ['already_voted']});
+        throw JSONError({proposition_id: ['already_voted']})
       }
-      await Vote().insert(voteFields);
-      return {proposition: Proposition({id: proposition_id}).first()};
+      await Vote().insert(voteFields)
+      return {proposition: Proposition({id}).first()}
     })
   }),
 
@@ -145,14 +143,14 @@ module.exports = {
     outputFields: {
       proposition: {type: new GraphQLNonNull(PropositionGQL)}
     },
-    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition_id}) => {
-      proposition_id = localizeID(proposition_id);
-      const voteFields = {proposition_id, user_id: user.id};
+    mutateAndGetPayload: resolveWithRequiredUser(async(user, {proposition_id: id}) => {
+      id = localizeID(id)
+      const voteFields = {proposition_id: id, user_id: user.id}
       if (!(await Vote(voteFields).first())) {
-        throw JSONError({proposition_id: ['not_voted']});
+        throw JSONError({proposition_id: ['not_voted']})
       }
-      await Vote().where(voteFields).del();
-      return {proposition: Proposition({id: proposition_id}).first()};
+      await Vote().where(voteFields).del()
+      return {proposition: Proposition({id}).first()}
     })
   }),
 
@@ -168,13 +166,13 @@ module.exports = {
     },
     mutateAndGetPayload: async({name, password}) => {
       if (password.length < 8) {
-        throw JSONError({password: ['too_short']});
+        throw JSONError({password: ['too_short']})
       }
       if (await User.firstByName(name)) {
-        throw JSONError({name: ['exists']});
+        throw JSONError({name: ['exists']})
       }
-      const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-      const [id] = await User().insert({name: name.trim(), password_hash}, 'id');
+      const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
+      const [id] = await User().insert({name: name.trim(), password_hash: passwordHash}, 'id')
       return {
         jwt: jwt.sign({user_id: id}),
         viewer: {
@@ -195,12 +193,12 @@ module.exports = {
       viewer: {type: new GraphQLNonNull(ViewerGQL)}
     },
     mutateAndGetPayload: async({name, password}) => {
-      const user = await User.firstByName(name);
+      const user = await User.firstByName(name)
       if (!user) {
-        throw JSONError({name: ['not_found']});
+        throw JSONError({name: ['not_found']})
       }
       if (!await bcrypt.compare(password, user.password_hash)) {
-        throw JSONError({password: ['invalid']});
+        throw JSONError({password: ['invalid']})
       }
       return {
         jwt: jwt.sign({user_id: user.id}),
@@ -217,9 +215,9 @@ module.exports = {
       viewer: {type: new GraphQLNonNull(ViewerGQL)}
     },
     mutateAndGetPayload: (input, req) => {
-      delete req.user_id;
-      return {viewer: {}};
+      delete req.user_id
+      return {viewer: {}}
     }
   })
 
-};
+}

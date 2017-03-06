@@ -9,9 +9,9 @@ CREATE TABLE propositions (
   votes INT NOT NULL DEFAULT 0,
   type proposition_type
 );
-`);
+`)
 
 exports.down = (knex) => knex.raw(`
 DROP TABLE propositions;
 DROP TYPE proposition_type;
-`);
+`)

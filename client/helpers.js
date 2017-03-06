@@ -1,22 +1,22 @@
-import _ from 'lodash';
-import {SubmissionError} from 'redux-form';
+import _ from 'lodash'
+import {SubmissionError} from 'redux-form'
 
-const genericErrorMessage = 'There was a problem submitting this form. Try again later.';
+const genericErrorMessage = 'There was a problem submitting this form. Try again later.'
 
 export const getErrors = (t) => {
-  const {source} = t.getError();
+  const {source} = t.getError()
 
-  return source ? JSON.parse(source.errors[0].message) : null;
-};
+  return source ? JSON.parse(source.errors[0].message) : null
+}
 
-export const getTypeLabel = (type) => type === 'PRO' ? 'Agree' : 'Disagree';
+export const getTypeLabel = (type) => type === 'PRO' ? 'Agree' : 'Disagree'
 
 export const asSubmissionError = (t, fields) => {
-  const errors = getErrors(t);
+  const errors = getErrors(t)
 
-  if (!errors) return new SubmissionError({_error: genericErrorMessage});
+  if (!errors) return new SubmissionError({_error: genericErrorMessage})
 
-  if (!fields) return new SubmissionError(errors);
+  if (!fields) return new SubmissionError(errors)
 
   const errorMessages = _(fields).toPairs()
     .map(([field, errorTypesMessage]) => [
@@ -26,9 +26,9 @@ export const asSubmissionError = (t, fields) => {
       )).filter().join(' ')
     ])
     .fromPairs()
-    .value();
+    .value()
   return new SubmissionError({
     ...errorMessages,
     _error: errors.message || errorMessages || genericErrorMessage
-  });
-};
+  })
+}

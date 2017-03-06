@@ -1,16 +1,15 @@
-import Relay from 'react-relay';
+import Relay from 'react-relay'
 
 export default class Logout extends Relay.Mutation {
-
-  getMutation() {
-    return Relay.QL`mutation { logout }`;
+  getMutation () {
+    return Relay.QL`mutation { logout }`
   }
 
-  getVariables() {
-    return {};
+  getVariables () {
+    return {}
   }
 
-  getFatQuery() {
+  getFatQuery () {
     return Relay.QL`
       fragment on LogoutPayload {
         viewer {
@@ -18,16 +17,15 @@ export default class Logout extends Relay.Mutation {
           user
         }
       }
-    `;
+    `
   }
 
-  getConfigs() {
+  getConfigs () {
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
         viewer: 'viewer'
       }
-    }];
+    }]
   }
-
 }

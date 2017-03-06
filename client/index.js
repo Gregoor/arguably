@@ -1,21 +1,18 @@
-import NProgress from 'nprogress';
-import '../node_modules/nprogress/nprogress.css';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Relay from 'react-relay';
-import {RelayNetworkLayer, authMiddleware, loggerMiddleware} from 'react-relay-network-layer';
-import {applyRouterMiddleware, browserHistory, IndexRoute, Router, Route} from 'react-router';
-import useRelay from 'react-router-relay';
-import {injectGlobal} from 'styled-components';
-
-import store from './store';
-import Layout from './components/layout';
-import logout from './logout';
-
-import AuthPage from './pages/auth';
-import PropositionPage from './pages/proposition';
-import IndexPage from './pages/index';
-
+import NProgress from 'nprogress'
+import '../node_modules/nprogress/nprogress.css'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Relay from 'react-relay'
+import {RelayNetworkLayer, authMiddleware, loggerMiddleware} from 'react-relay-network-layer'
+import {applyRouterMiddleware, browserHistory, IndexRoute, Router, Route} from 'react-router'
+import useRelay from 'react-router-relay'
+import {injectGlobal} from 'styled-components'
+import store from './store'
+import Layout from './components/layout'
+import logout from './logout'
+import AuthPage from './pages/auth'
+import PropositionPage from './pages/proposition'
+import IndexPage from './pages/index'
 
 Relay.injectNetworkLayer(new RelayNetworkLayer([
   authMiddleware({
@@ -24,30 +21,30 @@ Relay.injectNetworkLayer(new RelayNetworkLayer([
   }),
   loggerMiddleware({
     logger: (text, {relayReqObj}) => {
-      if (!relayReqObj) return;
-      NProgress.start();
-      relayReqObj.then(() => NProgress.done());
+      if (!relayReqObj) return
+      NProgress.start()
+      relayReqObj.then(() => NProgress.done())
     }
   })
-], {disableBatchQuery: true}));
+], {disableBatchQuery: true}))
 
-const node = () => Relay.QL`query { node(id: $nodeID) }`;
-const viewer = () => Relay.QL`query { viewer }`;
+const node = () => Relay.QL`query { node(id: $nodeID) }`
+const viewer = () => Relay.QL`query { viewer }`
 
 const logoutOnInvalidToken = ({error, props}) => {
   if (error && error.json) {
     for (const {message} of error.json.errors) {
-      console.error(message);
-      const parsedError = JSON.parse(message);
+      console.error(message)
+      const parsedError = JSON.parse(message)
 
       if (parsedError.jwt) {
-        logout();
-        location.href = '/';
+        logout()
+        location.href = '/'
       }
     }
   }
-  return props && <Layout {...props} />;
-};
+  return props && <Layout {...props} />
+}
 
 // eslint-disable-next-line
 injectGlobal`
@@ -68,7 +65,7 @@ injectGlobal`
   a:-webkit-any-link {
     color: #1976D2;
   }
-`;
+`
 
 ReactDOM.render(
   <Router
@@ -83,4 +80,4 @@ ReactDOM.render(
     </Route>
   </Router>,
   document.getElementById('root')
-);
+)

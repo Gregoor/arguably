@@ -1,11 +1,9 @@
-import React from 'react';
-import DocumentTitle from 'react-document-title';
-import Relay from 'react-relay';
-
-import PropositionCard from '../components/proposition-card';
-import PropositionList from '../components/proposition-list';
-import Search from '../components/search';
-
+import React from 'react'
+import DocumentTitle from 'react-document-title'
+import Relay from 'react-relay'
+import PropositionCard from '../components/proposition-card'
+import PropositionList from '../components/proposition-list'
+import Search from '../components/search'
 
 export default Relay.createContainer(
   ({viewer, relay}) => (
@@ -36,4 +34,4 @@ export default Relay.createContainer(
     `}
 
   }
-);
+)

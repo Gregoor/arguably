@@ -1,22 +1,18 @@
-import React from 'react';
-import Relay from 'react-relay';
-import styled, {css} from 'styled-components';
+import React from 'react'
+import Relay from 'react-relay'
+import styled, {css} from 'styled-components'
+import VoteMutation from '../../mutations/vote'
+import {getTypeLabel} from '../../helpers'
+import {CardSection, CardTitle, PropositionLink, PropositionTitleLink} from '../ui'
+import {StatsBar, TypeTag} from './components'
+import arrowUp from './ic_keyboard_arrow_up_black_24px.svg'
+import compareArrows from './ic_compare_arrows_black_24px.svg'
+import modeEdit from './ic_mode_edit_black_24px.svg'
 
-import VoteMutation from '../../mutations/vote';
+const vote = (proposition) => Relay.Store.commitUpdate(new VoteMutation({proposition}))
 
-import {StatsBar, TypeTag} from './components';
-import {getTypeLabel} from '../../helpers';
-import {CardSection, CardTitle, PropositionLink, PropositionTitleLink} from '../ui';
-
-import arrowUp from './ic_keyboard_arrow_up_black_24px.svg';
-import compareArrows from './ic_compare_arrows_black_24px.svg';
-import modeEdit from './ic_mode_edit_black_24px.svg';
-
-
-const vote = (proposition) => Relay.Store.commitUpdate(new VoteMutation({proposition}));
-
-const activeColor = 'black';
-const inactiveColor = '#aab8c2';
+const activeColor = 'black'
+const inactiveColor = '#aab8c2'
 const imageContainerChunk = css`
   display: flex;
   align-items: center;
@@ -37,29 +33,29 @@ const imageContainerChunk = css`
       fill: ${(props) => props.active ? inactiveColor : activeColor};  
     }
   }
-`;
+`
 
 const ImageLink = styled(PropositionLink)`
   ${imageContainerChunk}
-`;
+`
 
 const ImageButton = styled.button`
   background: none;
   border: none;
   ${imageContainerChunk}
-`;
+`
 
 const ImageWrapper = styled.span`
   width: 20px;
   margin-right: 4px;
-`;
+`
 
 const SourceSection = ({children}) => (
   <CardSection>
     <b style={{marginRight: 5}}>Source:</b>
     {children}
   </CardSection>
-);
+)
 
 export default Relay.createContainer(
   ({
@@ -67,14 +63,14 @@ export default Relay.createContainer(
       user: author,
       id,
       name,
-      propositions_count,
+      propositions_count: childCount,
       published,
       parent,
-      source_url,
+      source_url: sourceURL,
       text,
       type,
-      voted_by_user,
-      votes_count,
+      voted_by_user: votedByUser,
+      votes_count: votesCount,
       ...proposition
     },
     viewer: {user},
@@ -99,19 +95,19 @@ export default Relay.createContainer(
       </CardTitle>
 
       {text && <CardSection>{text}</CardSection>}
-      {source_url && <SourceSection><a href={source_url}>{source_url}</a></SourceSection>}
+      {sourceURL && <SourceSection><a href={sourceURL}>{sourceURL}</a></SourceSection>}
 
       <StatsBar>
         <div style={{display: 'flex', flexDirection: 'row'}}>
-          <ImageButton id={id} title={voted_by_user ? 'Undo vote' : 'Upvote'}
+          <ImageButton id={id} title={votedByUser ? 'Undo vote' : 'Upvote'}
                        style={{marginRight: 16}}
-                       onClick={() => vote(proposition)} active={voted_by_user}>
+                       onClick={() => vote(proposition)} active={votedByUser}>
             <ImageWrapper dangerouslySetInnerHTML={{__html: arrowUp}}/>
-            <span>{votes_count}</span>
+            <span>{votesCount}</span>
           </ImageButton>
           <ImageLink id={id} title="Discuss">
             <ImageWrapper dangerouslySetInnerHTML={{__html: compareArrows}}/>
-            {propositions_count || ''}
+            {childCount || ''}
           </ImageLink>
         </div>
         {user && (user.can_publish || (!published && author.id)) && (
@@ -157,4 +153,4 @@ export default Relay.createContainer(
     }
 
   }
-);
+)

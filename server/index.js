@@ -1,38 +1,32 @@
-require('dotenv').config();
+require('dotenv').config()
+const {createServer} = require('http')
+const path = require('path')
+const chalk = require('chalk')
+const compression = require('compression')
+const cors = require('cors')
+const express = require('express')
+const graphqlHTTP = require('express-graphql')
+const schema = require('./graphql')
+const {JSONError, jwt} = require('./helpers')
 
-const {createServer} = require('http');
-const path = require('path');
-const url = require('url');
+const PORT = process.env.PORT || 4242
+const DEV_MODE = process.env.NODE_ENV === 'development'
 
-const chalk = require('chalk');
-const compression = require('compression');
-const cors = require('cors');
-const express = require('express');
-const graphqlHTTP = require('express-graphql');
-const _ = require('lodash');
+const app = express()
 
-const schema = require('./graphql');
-const {JSONError, jwt} = require('./helpers');
-
-const PORT = process.env.PORT || 4242;
-const DEV_MODE = process.env.NODE_ENV == 'development';
-
-
-const app = express();
-
-app.use('/graphql', cors());
+app.use('/graphql', cors())
 app.use('/graphql', graphqlHTTP((req) => {
-  const authorization = req.headers['authorization'];
+  const authorization = req.headers['authorization']
   if (authorization) {
-    const [authType, token] = authorization.split(' ');
-    if (authType == 'Bearer') {
+    const [authType, token] = authorization.split(' ')
+    if (authType === 'Bearer') {
       try {
-        req.user_id = jwt.safeDecode(token).user_id;
+        req.user_id = jwt.safeDecode(token).user_id
       } catch (e) {
-        const [messageStart, ...messageRest] = e.message.split(' ');
+        const [messageStart, ...messageRest] = e.message.split(' ')
         throw JSONError({
-          jwt: [(messageStart == 'jwt' ? messageRest : e.message.split(' ')).join('_')]
-        });
+          jwt: [(messageStart === 'jwt' ? messageRest : e.message.split(' ')).join('_')]
+        })
       }
     }
   }
@@ -44,27 +38,27 @@ app.use('/graphql', graphqlHTTP((req) => {
         return {
           message: JSON.parse(error.message) && error.message,
           locations: error.locations
-        };
+        }
       } catch (e) {
-        console.error(error);
+        console.error(error)
         return DEV_MODE
           ? {
             message: error.message,
             locations: error.locations,
             stack: error.stack
           }
-          : {message: 'no can do'};
+          : {message: 'no can do'}
       }
     }
-  };
-}));
+  }
+}))
 
-app.use(compression());
-app.use(express.static('build'));
-app.use((req, res) => res.sendFile(path.join(__dirname, '..', 'build', 'index.html')));
+app.use(compression())
+app.use(express.static('build'))
+app.use((req, res) => res.sendFile(path.join(__dirname, '..', 'build', 'index.html')))
 
-console.log(chalk.cyan('Starting...'));
+console.log(chalk.cyan('Starting...'))
 createServer(app).listen(PORT, (err) => {
-  if (err) throw err;
+  if (err) throw err
   console.log('  ' + chalk.cyan(`http://localhost:${PORT}`))
-});
+})

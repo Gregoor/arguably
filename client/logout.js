@@ -1,10 +1,9 @@
-import Relay from 'react-relay';
+import Relay from 'react-relay'
 
-import LogoutMutation from './mutations/logout';
-import store from './store';
-
+import LogoutMutation from './mutations/logout'
+import store from './store'
 
 module.exports = () => {
-  store.dispatch({type: 'LOGOUT'});
-  Relay.Store.commitUpdate(new LogoutMutation());
-};
+  store.dispatch({type: 'LOGOUT'})
+  Relay.Store.commitUpdate(new LogoutMutation())
+}
