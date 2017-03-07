@@ -20,13 +20,14 @@ Relay.injectNetworkLayer(new RelayNetworkLayer([
     token: () => store.getState().state.jwt
   }),
   loggerMiddleware({
-    logger: (text, {relayReqObj}) => {
+    logger: async(text, {relayReqObj}) => {
       if (!relayReqObj) return
       NProgress.start()
-      relayReqObj.then(() => NProgress.done())
+      await Promise.all(Array.isArray(relayReqObj) ? relayReqObj : [relayReqObj])
+      NProgress.done()
     }
   })
-], {disableBatchQuery: true}))
+]))
 
 const node = () => Relay.QL`query { node(id: $nodeID) }`
 const viewer = () => Relay.QL`query { viewer }`

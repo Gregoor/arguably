@@ -1,21 +1,20 @@
 require('dotenv').config()
 const {createServer} = require('http')
 const path = require('path')
+const bodyParser = require('body-parser')
 const chalk = require('chalk')
 const compression = require('compression')
 const cors = require('cors')
 const express = require('express')
 const graphqlHTTP = require('express-graphql')
+const {graphqlBatchHTTPWrapper} = require('react-relay-network-layer')
 const schema = require('./graphql')
 const {JSONError, jwt} = require('./helpers')
 
 const PORT = process.env.PORT || 4242
 const DEV_MODE = process.env.NODE_ENV === 'development'
 
-const app = express()
-
-app.use('/graphql', cors())
-app.use('/graphql', graphqlHTTP((req) => {
+const graphqlSettingsPerRequest = (req) => {
   const authorization = req.headers['authorization']
   if (authorization) {
     const [authType, token] = authorization.split(' ')
@@ -51,7 +50,19 @@ app.use('/graphql', graphqlHTTP((req) => {
       }
     }
   }
-}))
+}
+
+const graphqlBatchMiddleware = graphqlBatchHTTPWrapper(
+  graphqlHTTP(req => req.graphqlServerSettings)
+)
+
+const app = express()
+
+app.use('/graphql/batch', cors(), bodyParser.json(), (req, res, next) => {
+  req.graphqlServerSettings = graphqlSettingsPerRequest(req)
+  graphqlBatchMiddleware(req, res, next)
+})
+app.use('/graphql', cors(), graphqlHTTP(graphqlSettingsPerRequest))
 
 app.use(compression())
 app.use(express.static('build'))
