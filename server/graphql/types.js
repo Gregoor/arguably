@@ -25,7 +25,7 @@ const knexToConnection = async(baseQuery, {first, after, last, before, order}) =
 
   const offset = parseInt(after, 10) || 0
   if (first) {
-    query = query.clone().limit(first).offset(offset)
+    query = query.clone().limit(first - offset).offset(offset)
   } else if (last) {
     // TODO
   }
@@ -53,10 +53,10 @@ const knexToConnection = async(baseQuery, {first, after, last, before, order}) =
     pageInfo: {
       hasNextPage: Boolean(!isThisAll && offset + (first || 0) < total),
       hasPreviousPage: Boolean(!isThisAll && offset > 0),
-      startCursor: 0,
-      endCursor: total
+      startCursor: offset,
+      endCursor: offset + total
     },
-    edges: nodes.map((node, i) => ({node, cursor: i}))
+    edges: nodes.map((node, i) => ({node, cursor: offset + i}))
   }
 }
 
