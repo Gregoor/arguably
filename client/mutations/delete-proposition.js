@@ -2,15 +2,16 @@ import Relay from 'react-relay'
 import _ from 'lodash'
 
 export default class UpdateProposition extends Relay.Mutation {
-  getMutation () {
+
+  getMutation() {
     return Relay.QL`mutation { deleteProposition }`
   }
 
-  getVariables () {
+  getVariables() {
     return _.pick(this.props, 'id')
   }
 
-  getFatQuery () {
+  getFatQuery() {
     return Relay.QL`
       fragment on DeletePropositionPayload {
         id
@@ -22,7 +23,7 @@ export default class UpdateProposition extends Relay.Mutation {
     `
   }
 
-  getConfigs () {
+  getConfigs() {
     return [{
       type: 'RANGE_DELETE',
       parentName: 'parent',
@@ -32,4 +33,5 @@ export default class UpdateProposition extends Relay.Mutation {
       pathToConnection: ['parent', 'propositions']
     }]
   }
+
 }

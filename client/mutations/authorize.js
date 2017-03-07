@@ -2,17 +2,18 @@ import Relay from 'react-relay'
 import _ from 'lodash'
 
 export default class Authorize extends Relay.Mutation {
-  getMutation () {
+
+  getMutation() {
     return this.props.isNew
       ? Relay.QL`mutation { register }`
       : Relay.QL`mutation { login }`
   }
 
-  getVariables () {
+  getVariables() {
     return _.pick(this.props, 'name', 'password')
   }
 
-  getFatQuery () {
+  getFatQuery() {
     return this.props.isNew
       ? Relay.QL`
         fragment on RegisterPayload {
@@ -32,7 +33,7 @@ export default class Authorize extends Relay.Mutation {
       `
   }
 
-  getConfigs () {
+  getConfigs() {
     return [
       {
         type: 'FIELDS_CHANGE',
@@ -58,4 +59,5 @@ export default class Authorize extends Relay.Mutation {
       }
     ]
   }
+
 }

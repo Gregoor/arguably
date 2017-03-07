@@ -13,4 +13,6 @@ rules:
   import/order: 2
   object-curly-spacing: 2
   jsx-a11y/label-has-for: 0
+  padded-blocks: [error, classes: always]
   react/jsx-uses-vars: 1
+  space-before-function-paren: [error, never]

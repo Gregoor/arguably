@@ -25,7 +25,7 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 
 // Input: /User/dan/app/build/static/js/main.82be8.js
 // Output: /static/js/main.js
-function removeFileNameHash (fileName) {
+function removeFileNameHash(fileName) {
   return fileName
     .replace(paths.appBuild, '')
     .replace(/\/?(.*)(\.\w+)(\.js|\.css)/, (match, p1, p2, p3) => p1 + p3)
@@ -33,7 +33,7 @@ function removeFileNameHash (fileName) {
 
 // Input: 1024, 2048
 // Output: "(+1 KB)"
-function getDifferenceLabel (currentSize, previousSize) {
+function getDifferenceLabel(currentSize, previousSize) {
   const FIFTY_KILOBYTES = 1024 * 50
   const difference = currentSize - previousSize
   const fileSize = !Number.isNaN(difference) ? filesize(difference) : 0
@@ -75,7 +75,7 @@ recursive(paths.appBuild, (err, fileNames) => {
 })
 
 // Print a detailed summary of build files.
-function printFileSizes (stats, previousSizeMap) {
+function printFileSizes(stats, previousSizeMap) {
   const assets = stats.toJson().assets
     .filter(asset => /\.(js|css)$/.test(asset.name))
     .map(asset => {
@@ -109,7 +109,7 @@ function printFileSizes (stats, previousSizeMap) {
 }
 
 // Print out errors
-function printErrors (summary, errors) {
+function printErrors(summary, errors) {
   console.log(chalk.red(summary))
   console.log()
   errors.forEach(err => {
@@ -119,7 +119,7 @@ function printErrors (summary, errors) {
 }
 
 // Create the production build and print the deployment instructions.
-function build (previousSizeMap) {
+function build(previousSizeMap) {
   console.log('Creating an optimized production build...')
   webpack(config).run((err, stats) => {
     if (err) {
@@ -218,7 +218,7 @@ function build (previousSizeMap) {
   })
 }
 
-function copyPublicFolder () {
+function copyPublicFolder() {
   fs.copySync(paths.appPublic, paths.appBuild, {
     dereference: true,
     filter: file => file !== paths.appHtml

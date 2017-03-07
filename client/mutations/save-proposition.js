@@ -1,17 +1,18 @@
 import Relay from 'react-relay'
 
 export default class SaveProposition extends Relay.Mutation {
-  getMutation () {
+
+  getMutation() {
     return this.props.id
       ? Relay.QL`mutation { updateProposition }`
       : Relay.QL`mutation { createProposition }`
   }
 
-  getVariables () {
+  getVariables() {
     return {proposition: this.props}
   }
 
-  getFatQuery () {
+  getFatQuery() {
     return this.props.id
         ? Relay.QL`
           fragment on UpdatePropositionPayload {
@@ -35,7 +36,7 @@ export default class SaveProposition extends Relay.Mutation {
       `
   }
 
-  getConfigs () {
+  getConfigs() {
     const {id, parent_id: parentID} = this.props
     return [id
       ? {
@@ -54,4 +55,5 @@ export default class SaveProposition extends Relay.Mutation {
       }
     ]
   }
+
 }

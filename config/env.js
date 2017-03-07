@@ -3,7 +3,7 @@
 
 const REACT_APP = /^REACT_APP_/i
 
-function getClientEnvironment (publicUrl) {
+function getClientEnvironment(publicUrl) {
   const raw = Object
     .keys(process.env)
     .filter(key => REACT_APP.test(key))

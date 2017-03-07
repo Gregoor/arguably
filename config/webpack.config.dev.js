@@ -135,7 +135,7 @@ module.exports = {
   },
 
   // We use PostCSS for autoprefixing only.
-  postcss: function () {
+  postcss: function() {
     return [
       autoprefixer({
         browsers: [

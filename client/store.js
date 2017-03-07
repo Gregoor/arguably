@@ -7,7 +7,7 @@ const initialState = {
 }
 
 export default createStore(combineReducers({
-  state (state = initialState, action) {
+  state(state = initialState, action) {
     switch (action.type) {
       case 'LOGIN':
         store.set('jwt', action.jwt)

@@ -42,6 +42,7 @@ const LanguageRadio = ({input, language}) => {
 const FormTextArea = ({input, label}) => <TextArea {...input} placeholder={label}/>
 
 class Form extends React.Component {
+
   static defaultProps = {
     onCancel: _.noop
   };
@@ -75,7 +76,7 @@ class Form extends React.Component {
     Relay.Store.commitUpdate(new DeletePropositionMutation({id, parent_id: this.getParentID()}))
   };
 
-  render () {
+  render() {
     const {
       dirty, handleSubmit, onCancel, proposition, submitting, viewer: {languages, user}
     } = this.props
@@ -144,6 +145,7 @@ class Form extends React.Component {
       </div>
     )
   }
+
 }
 
 export default _.flow([

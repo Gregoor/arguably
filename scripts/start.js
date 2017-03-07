@@ -28,7 +28,7 @@ const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000
 let compiler
 let handleCompile
 
-function setupCompiler (host, port, protocol) {
+function setupCompiler(host, port, protocol) {
   // "Compiler" is a low-level interface to Webpack.
   // It lets us listen to some events and provide our own custom messages.
   compiler = webpack(config, handleCompile)
@@ -37,7 +37,7 @@ function setupCompiler (host, port, protocol) {
   // recompiling a bundle. WebpackDevServer takes care to pause serving the
   // bundle, so if you refresh, it'll wait instead of serving the old one.
   // "invalid" is short for "bundle invalidated", it doesn't imply any errors.
-  compiler.plugin('invalid', function () {
+  compiler.plugin('invalid', function() {
     if (isInteractive) {
       clearConsole()
     }
@@ -48,7 +48,7 @@ function setupCompiler (host, port, protocol) {
 
   // "done" event fires when Webpack has finished recompiling the bundle.
   // Whether or not you have warnings or errors, you will get this event.
-  compiler.plugin('done', function (stats) {
+  compiler.plugin('done', function(stats) {
     if (isInteractive) {
       clearConsole()
     }
@@ -98,8 +98,8 @@ function setupCompiler (host, port, protocol) {
 
 // We need to provide a custom onError function for httpProxyMiddleware.
 // It allows us to log custom error messages on the console.
-function onProxyError (proxy) {
-  return function (err, req, res) {
+function onProxyError(proxy) {
+  return function(err, req, res) {
     const host = req.headers && req.headers.host
     console.log(
       chalk.red('Proxy error:') + ' Could not proxy request ' + chalk.cyan(req.url) +
@@ -122,7 +122,7 @@ function onProxyError (proxy) {
   }
 }
 
-function addMiddleware (devServer) {
+function addMiddleware(devServer) {
   // `proxy` lets you to specify a fallback server during development.
   // Every unrecognized request will be forwarded to it.
   let proxy = require(paths.appPackageJson).proxy
@@ -162,7 +162,7 @@ function addMiddleware (devServer) {
     const hpm = httpProxyMiddleware(pathname => mayProxy.test(pathname), {
       target: proxy,
       logLevel: 'silent',
-      onProxyReq: function (proxyReq, req, res) {
+      onProxyReq: function(proxyReq, req, res) {
         // Browers may send Origin headers even with same-origin
         // requests. To prevent CORS issues, we have to change
         // the Origin to match the target URL.
@@ -189,7 +189,7 @@ function addMiddleware (devServer) {
   devServer.use(devServer.middleware)
 }
 
-function runDevServer (host, port, protocol) {
+function runDevServer(host, port, protocol) {
   const devServer = new WebpackDevServer(compiler, {
     // Enable gzip compression of generated files.
     compress: true,
@@ -249,7 +249,7 @@ function runDevServer (host, port, protocol) {
   })
 }
 
-function run (port) {
+function run(port) {
   const protocol = process.env.HTTPS === 'true' ? 'https' : 'http'
   const host = process.env.HOST || 'localhost'
   setupCompiler(host, port, protocol)

@@ -6,7 +6,7 @@ const assignProperties = (Entity, properties) => Object.assign(
   Entity,
   _(properties).toPairs().map(([key, fn]) => [
     key,
-    function (...args) {
+    function(...args) {
       return assignProperties(fn(this.where ? this : this(), ...args), properties)
     }
   ]).fromPairs().value(),
@@ -34,7 +34,7 @@ const assignRelations = (qb, relations) => Object.assign(qb, _.mapValues(relatio
 
 module.exports = {
 
-  createEntity (tableName, properties = {}) {
+  createEntity(tableName, properties = {}) {
     const Entity = (fields = {}) => knex(tableName).where(fields)
     return assignProperties(Entity, properties)
   },

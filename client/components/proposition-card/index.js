@@ -11,6 +11,7 @@ const Separator = styled.hr`
 
 const Content = Relay.createContainer(
   class extends React.Component {
+
     state = {
       isEditing: false
     };
@@ -19,7 +20,7 @@ const Content = Relay.createContainer(
       this.setState((state) => ({isEditing: !state.isEditing}))
     };
 
-    render () {
+    render() {
       const {relay, parentID, proposition, viewer, hideParent, showType} = this.props
       const {withParent} = relay.variables
       const {has_parent: hasParent, parent} = proposition || {}
@@ -45,7 +46,8 @@ const Content = Relay.createContainer(
         </div>
       )
     }
-  },
+
+},
   {
 
     initialVariables: {withParent: false},

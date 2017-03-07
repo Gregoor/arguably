@@ -1,6 +1,7 @@
 import Relay from 'react-relay'
 
 export default class Vote extends Relay.Mutation {
+
   static fragments = {
     proposition: () => Relay.QL`
       fragment on Proposition {
@@ -13,15 +14,15 @@ export default class Vote extends Relay.Mutation {
 
   getIsVoted = () => this.props.proposition.voted_by_user;
 
-  getMutation () {
+  getMutation() {
     return this.getIsVoted() ? Relay.QL`mutation { unvote }` : Relay.QL`mutation { vote }`
   }
 
-  getVariables () {
+  getVariables() {
     return {proposition_id: this.props.proposition.id}
   }
 
-  getFatQuery () {
+  getFatQuery() {
     return this.getIsVoted()
         ? Relay.QL`
           fragment on UnvotePayload {
@@ -41,7 +42,7 @@ export default class Vote extends Relay.Mutation {
       `
   }
 
-  getConfigs () {
+  getConfigs() {
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
@@ -50,7 +51,7 @@ export default class Vote extends Relay.Mutation {
     }]
   }
 
-  getOptimisticResponse () {
+  getOptimisticResponse() {
     const {voted_by_user: votedByUser, votes_count: votesCount} = this.props.proposition
     return {
       proposition: {
@@ -59,4 +60,5 @@ export default class Vote extends Relay.Mutation {
       }
     }
   }
+
 }
