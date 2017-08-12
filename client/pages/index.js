@@ -1,5 +1,4 @@
 import React from 'react'
-import DocumentTitle from 'react-document-title'
 import Relay from 'react-relay'
 import PropositionCard from '../components/proposition-card'
 import PropositionList from '../components/proposition-list'
@@ -7,7 +6,7 @@ import Search from '../components/search'
 
 export default Relay.createContainer(
   ({viewer, relay}) => (
-    <DocumentTitle title="Arguably"><div>
+    <div>
 
       <Search onChange={({target}) => relay.setVariables({query: target.value})}/>
 
@@ -16,7 +15,6 @@ export default Relay.createContainer(
       <PropositionList parent={viewer} viewer={viewer} query={relay.variables.query} withParent
                        cardProps={{showType: true}}/>
     </div>
-    </DocumentTitle>
   ),
   {
 

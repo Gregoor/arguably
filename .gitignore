@@ -1,6 +1,8 @@
-/node_modules
 /build
 /data
+node_modules/
+.next/
+__generated__/
 
 .DS_Store
 .env

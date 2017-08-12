@@ -1,0 +1,26 @@
+extends:
+  - react-app
+  - standard
+  - plugin:jsx-a11y/recommended
+plugins:
+  - import
+  - jsx-a11y
+  - promise
+  - react
+  - standard
+rules:
+  import/newline-after-import: [error]
+  import/order: 2
+  object-curly-spacing: 2
+  jsx-a11y/anchor-is-valid: 0
+  jsx-a11y/label-has-for: 0
+  jsx-a11y/href-no-hash: 0
+  padded-blocks: [error, classes: always]
+  react/jsx-closing-tag-location: 2
+  react/jsx-closing-bracket-location: 2
+  react/jsx-first-prop-new-line: [2, multiline-multiprop]
+  react/jsx-max-props-per-line: [2, {when: multiline}]
+  react/jsx-no-duplicate-props: 2
+  react/jsx-uses-vars: 2
+  no-return-assign: 0
+  space-before-function-paren: [error, {anonymous: never, named: never, asyncArrow: always}]

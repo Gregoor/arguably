@@ -1,0 +1,56 @@
+{
+  "name": "arguably-next",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "babel-plugin-inline-react-svg": "^0.4.0",
+    "express-graphql": "^0.6.7",
+    "graphql": "^0.10.5",
+    "graphql-relay": "^0.5.2",
+    "isomorphic-fetch": "^2.2.1",
+    "lodash": "^4.17.4",
+    "next": "^3.0.3",
+    "prop-types": "^15.5.10",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.6",
+    "react-relay": "^1.1.0",
+    "relay-runtime": "^1.1.0",
+    "tcomb": "^3.2.22"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-lodash": "^3.2.11",
+    "babel-plugin-relay": "^1.1.0",
+    "babel-plugin-styled-components": "^1.1.7",
+    "concurrently": "^3.5.0",
+    "eslint": "^4.4.1",
+    "eslint-config-react-app": "^2.0.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-flowtype": "^2.35.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-react": "^7.1.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "nodemon": "^1.11.0",
+    "pre-commit": "^1.2.2",
+    "relay-compiler": "^1.1.0"
+  },
+  "scripts": {
+    "build": "next build",
+    "build-schema": "node scripts/build-schema",
+    "dev": "NODE_ENV=development concurrently -p name -n 'lint,server,schema' --kill-others 'yarn watch-lint --silent' 'yarn watch-server --silent' 'yarn watch-schema --silent'",
+    "lint": "eslint .",
+    "relay": "relay-compiler --src . --schema data/schema.graphql",
+    "start": "NODE_ENV=production node server",
+    "watch-lint": "nodemon -q --watch . --exec yarn lint --silent",
+    "watch-server": "nodemon -q --watch server server/index.js",
+    "watch-schema": "nodemon -q --watch server/graphql/ --exec yarn build-schema --silent"
+  },
+  "pre-commit": [
+    "lint"
+  ]
+}

@@ -1,0 +1,95 @@
+type Language {
+  # The ID of an object
+  id: ID!
+  name: String!
+}
+
+# An object with an ID
+interface Node {
+  # The id of the object.
+  id: ID!
+}
+
+# Information about pagination in a connection.
+type PageInfo {
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: String
+
+  # When paginating forwards, the cursor to continue.
+  endCursor: String
+}
+
+type Proposition implements Node, PropositionsParent {
+  name: String!
+  isGeneral: Boolean!
+  published: Boolean!
+  sourceURL: String
+  text: String!
+
+  # The ID of an object
+  id: ID!
+  language: Language
+  propositions(isGeneral: Boolean, languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionConnection
+  propositionsCount: Int!
+}
+
+# A connection to a list of items.
+type PropositionConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [PropositionEdge]
+}
+
+# An edge in a connection.
+type PropositionEdge {
+  # The item at the end of the edge
+  node: Proposition
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+input PropositionOrder {
+  by: PropositionOrderBy!
+  desc: Boolean
+}
+
+enum PropositionOrderBy {
+  CREATED_AT
+  VOTES
+}
+
+interface PropositionsParent {
+  id: ID!
+  propositions(isGeneral: Boolean, languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionConnection
+  propositionsCount: Int!
+}
+
+type Query {
+  viewer: Viewer
+}
+
+type User {
+  name: String!
+  canVote: Boolean!
+  canPublish: Boolean!
+
+  # The ID of an object
+  id: ID!
+}
+
+type Viewer implements Node, PropositionsParent {
+  id: ID!
+  user: User
+  propositions(isGeneral: Boolean, languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionConnection
+  propositionsCount: Int!
+  languages: [Language]!
+}
