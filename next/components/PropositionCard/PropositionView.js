@@ -59,19 +59,21 @@ const SourceSection = ({children}) => (
 
 export default createFragmentContainer(
   ({
-    proposition: {
-      user: author,
+    propositionRelation: {
       id,
-      name,
-      propositions_count: childCount,
-      published,
-      parent,
-      sourceURL,
-      text,
+      childCount,
       type,
-      voted_by_user: votedByUser,
-      votes_count: votesCount,
-      ...proposition
+      proposition: {
+        user: author,
+        name,
+        published,
+        parent,
+        sourceURL,
+        text,
+        votedByUser,
+        votesCount,
+        ...proposition
+      }
     },
     viewer: {user},
     onEdit,
@@ -116,7 +118,7 @@ export default createFragmentContainer(
             </span>
           </ImageLink>
         </div>
-        {user && (user.can_publish || (!published && author.id)) && (
+        {user && (user.canPublish || (!published && author.id)) && (
           <ImageButton id={id} title="Edit" type="button" onClick={onEdit}>
             <span style={{width: 15}}><ModeEditSVG/></span>
           </ImageButton>
@@ -126,15 +128,16 @@ export default createFragmentContainer(
     </div>
   ),
   {
-    proposition: graphql`
-      fragment PropositionView_proposition on Proposition {
+    propositionRelation: graphql`
+      fragment PropositionView_propositionRelation on PropositionRelation {
         id
-        name
-        #          propositions_count
-        published
-        sourceURL
-        text
-#        type
+        type
+        proposition {
+          name
+          published
+          sourceURL
+          text
+        }
 #        votes_count
 #        voted_by_user
 #        user {

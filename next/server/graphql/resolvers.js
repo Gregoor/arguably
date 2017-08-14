@@ -1,4 +1,4 @@
-const {user} = require('../entities')
+const {User} = require('../entities')
 
 function JSONError(obj) {
   return new Error(JSON.stringify(obj))
@@ -6,10 +6,10 @@ function JSONError(obj) {
 
 const resolvers = {
 
-  resolveWithUser: (resolver) => async(...args) => {
+  resolveWithUser: (resolver) => async (...args) => {
     const id = args[2].userId || args[1].userId
-    const currentUser = id ? await user.find({id}) : null
-    return resolver(currentUser, ...args)
+    const user = id ? await User.find({id}) : null
+    return resolver(user, ...args)
   },
 
   resolveWithRequiredUser: (resolver) => resolvers.resolveWithUser((user, ...args) => {

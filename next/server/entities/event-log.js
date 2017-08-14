@@ -39,9 +39,13 @@ class Entity {
   }
 
   async findAll(args) {
-    const entities = await this.entities
-    return Array.from(entities.values())
-      .filter((entity) => Object.entries(args).every(([key, value]) => entity[key] === value))
+    return Array.from((await this.entities).values())
+      .filter((entity) => Object.entries(args).every(([key, value]) => {
+        const attr = entity[key]
+        return Array.isArray(value)
+          ? value.includes(attr)
+          : attr === value || (value === null && attr === undefined)
+      }))
       .map((entity) => Object.assign({}, entity))
   }
 
@@ -87,7 +91,10 @@ function rehydrate(store) {
       .pipe(es.mapSync((line) => {
         rehydrateStream.pause()
 
-        if (line.length) store.mergeEvent(JSON.parse(line))
+        if (line.length) {
+          const event = JSON.parse(line)
+          store.mergeEvent(event)
+        }
 
         rehydrateStream.resume()
       }))

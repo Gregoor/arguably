@@ -6,7 +6,7 @@ import PropositionCard from './PropositionCard/PropositionCard'
 const BATCH_SIZE = 3
 
 export default createPaginationContainer(
-  ({relay, parent: {propositions: {pageInfo, edges}}, viewer, cardProps}) => (
+  ({relay, parent: {children: {pageInfo, edges}}, viewer, cardProps}) => (
     <InfiniteScroll
       hasMore={pageInfo.hasNextPage}
       loadMore={() => relay.hasMore() && relay.loadMore(BATCH_SIZE)}
@@ -16,7 +16,7 @@ export default createPaginationContainer(
         <PropositionCard
           key={node.id}
           {...cardProps}
-          proposition={node}
+          propositionRelation={node}
           viewer={viewer}
           withParent={false/* relay.variables.withParent */}
         />
@@ -26,16 +26,16 @@ export default createPaginationContainer(
   {
     parent: graphql.experimental`
       fragment PropositionList_parent on Viewer {
-        propositions(
+        children(
           after: $cursor
           first: $count
           order: $order
           #          query: $query
-        ) @connection(key: "PropositionList_propositions") {
+        ) @connection(key: "PropositionList_children") {
           edges {
             node {
               id
-              ...PropositionCard_proposition 
+              ...PropositionCard_propositionRelation 
             }
           }
           pageInfo {
@@ -54,7 +54,7 @@ export default createPaginationContainer(
   {
     direction: 'forward',
     getConnectionFromProps({parent}) {
-      return parent && parent.propositions
+      return parent && parent.children
     },
     getFragmentVariables(prevVars, totalCount) {
       return {
@@ -62,7 +62,7 @@ export default createPaginationContainer(
         count: totalCount
       }
     },
-    getVariables(props, {count, cursor}, fragmentVariables) {
+    getVariables(props, {cursor}, fragmentVariables) {
       return {
         count: BATCH_SIZE,
         cursor,
@@ -76,7 +76,7 @@ export default createPaginationContainer(
         $order: PropositionOrder!
       ) {
         viewer {
-          ...PropositionLis t_parent
+          ...PropositionList_parent
           ...PropositionList_viewer
         }
       }

@@ -12,14 +12,14 @@ export default class Vote extends Relay.Mutation {
     `
   };
 
-  getIsVoted = () => this.props.proposition.voted_by_user;
+  getIsVoted = () => this.props.Proposition.voted_by_user;
 
   getMutation() {
     return this.getIsVoted() ? Relay.QL`mutation { unvote }` : Relay.QL`mutation { vote }`
   }
 
   getVariables() {
-    return {proposition_id: this.props.proposition.id}
+    return {proposition_id: this.props.Proposition.id}
   }
 
   getFatQuery() {
@@ -46,13 +46,13 @@ export default class Vote extends Relay.Mutation {
     return [{
       type: 'FIELDS_CHANGE',
       fieldIDs: {
-        proposition: this.props.proposition.id
+        proposition: this.props.Proposition.id
       }
     }]
   }
 
   getOptimisticResponse() {
-    const {voted_by_user: votedByUser, votes_count: votesCount} = this.props.proposition
+    const {voted_by_user: votedByUser, votes_count: votesCount} = this.props.Proposition
     return {
       proposition: {
         voted_by_user: !votedByUser,

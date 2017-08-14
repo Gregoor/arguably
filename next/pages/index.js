@@ -27,7 +27,6 @@ export default Page(
     query pages_indexQuery(
       $count: Int!
       $cursor: String
-      $isGeneral: Boolean!
       $order: PropositionOrder!
     ) {
       viewer {

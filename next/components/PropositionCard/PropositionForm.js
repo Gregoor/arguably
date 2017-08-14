@@ -50,13 +50,13 @@ class Form extends React.Component {
   };
 
   getParentID = () => {
-    const {parentID, proposition} = this.props
-    const {parent} = proposition || {}
+    const {parentID, proposition: propositionRelation} = this.props
+    const {parent} = propositionRelation || {}
     return parent ? parent.id : parentID
   };
 
   save = (values) => {
-    const {id} = this.props.proposition || {}
+    const {id} = this.props.propositionRelation || {}
 
     const data = {id, ...values}
     const parentID = this.getParentID()
@@ -80,8 +80,9 @@ class Form extends React.Component {
 
   render() {
     const {
-      dirty, handleSubmit, onCancel, proposition, submitting, viewer: {languages, user}
+      dirty, handleSubmit, onCancel, propositionRelation, submitting, viewer: {languages, user}
     } = this.props
+    const {proposition} = propositionRelation
     return (
       <div>
         <form onSubmit={handleSubmit(this.save)}>
@@ -90,7 +91,7 @@ class Form extends React.Component {
             <Field name="name" component={Input} type="text" label="Make a concise argument"/>
           </CardTitle>
 
-          <div style={{display: (proposition || dirty) ? 'block' : 'none'}}>
+          <div style={{display: (propositionRelation || dirty) ? 'block' : 'none'}}>
 
             <CardSection>
               <Field name="text" component={FormTextArea} label="(Optional) extra text"/>
@@ -163,7 +164,7 @@ export default _.flow([
 
   connect(
     (state, {proposition, parentID, viewer}) => ({
-      form: 'proposition' + (proposition ? proposition.id : ''),
+      form: 'Proposition' + (proposition ? proposition.id : ''),
       initialValues: {
         language_id: proposition
           ? proposition.language.id
@@ -179,16 +180,18 @@ export default _.flow([
   ),
 
   (Form) => createFragmentContainer(Form, {
-    proposition: graphql`
-      fragment PropositionForm_proposition on Proposition {
+    propositionRelation: graphql`
+      fragment PropositionForm_propositionRelation on PropositionRelation {
         id
-        name
-        published
-        sourceURL
-        text
-        #          type
-        language {
-          id
+        type
+        proposition {
+          language {
+            id
+          }
+          name
+          published
+          sourceURL
+          text
         }
         #          user {
         #            id

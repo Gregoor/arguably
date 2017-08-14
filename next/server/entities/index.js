@@ -8,17 +8,16 @@ const languages = {
   2: 'german'
 }
 
-const user = createEntity('user', {
+const User = createEntity('user', {
   name: t.String,
   passwordHash: t.String,
   canVote: t.Boolean,
   canPublish: t.Boolean
 })
 
-const proposition = createEntity('proposition',
+const Proposition = createEntity('proposition',
   {
     name: t.String,
-    isGeneral: t.Boolean,
     languageId: t.enums.of(Object.keys(languages), 'Language'),
     published: t.Boolean,
     sourceURL: t.maybe(t.String),
@@ -29,22 +28,22 @@ const proposition = createEntity('proposition',
   }
 )
 
-const propositionRelation = createEntity('propositionRelation',
+const PropositionRelation = createEntity('propositionRelation',
   {
-    parentPropositionId: t.String,
-    childPropositionId: t.String,
-    type: t.enums.of(['pro', 'contra'], 'PropositionType')
+    parentId: t.maybe(t.String),
+    propositionId: t.String,
+    type: t.maybe(t.enums.of(['pro', 'contra'], 'PropositionType'))
   },
   {
     userId: t.String
   }
 )
 
-const vote = createEntity('vote', {
+const Vote = createEntity('vote', {
   userId: t.String,
   propositionRelationId: t.String
 })
 
 module.exports = {
-  languages, proposition, propositionRelation, user, vote
+  languages, Proposition, PropositionRelation, User, Vote
 }

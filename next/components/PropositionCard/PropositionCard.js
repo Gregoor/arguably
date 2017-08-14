@@ -21,9 +21,9 @@ const PropositionCard = createFragmentContainer(
     };
 
     render() {
-      const {relay, parentID, proposition, viewer, hideParent, showType} = this.props
+      const {relay, propositionRelation, viewer, hideParent, showType} = this.props
       const {withParent} = {} || relay.variables
-      const {has_parent: hasParent, parent} = proposition || {}
+      const {hasParent, parent} = propositionRelation || {}
 
       return (
         <Card>
@@ -47,15 +47,15 @@ const PropositionCard = createFragmentContainer(
               ),
             <Separator key="separator"/>
           ]}
-          {!proposition || this.state.isEditing
+          {!propositionRelation || this.state.isEditing
             ? (
               <PropositionForm
-                {...{proposition, viewer, parentID}}
+                {...{propositionRelation, viewer}}
                 onCancel={this.toggleIsEditing}
               />
             ) : (
               <PropositionView
-                {...{proposition, viewer}}
+                {...{propositionRelation, viewer}}
                 showType={showType || withParent}
                 onEdit={this.toggleIsEditing}
               />
@@ -67,14 +67,14 @@ const PropositionCard = createFragmentContainer(
 
   },
   {
-    proposition: graphql`
-      fragment PropositionCard_proposition on Proposition {
+    propositionRelation: graphql`
+      fragment PropositionCard_propositionRelation on PropositionRelation {
 #        has_parent
 #        parent {
 #          ...PropositionCard_proposition @include(if: $withParent)
 #        }
-        ...PropositionForm_proposition
-        ...PropositionView_proposition
+        ...PropositionForm_propositionRelation
+        ...PropositionView_propositionRelation
       }
     `,
     viewer: graphql`

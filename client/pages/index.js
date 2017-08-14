@@ -10,7 +10,7 @@ export default Relay.createContainer(
 
       <Search onChange={({target}) => relay.setVariables({query: target.value})}/>
 
-      {viewer.user && <PropositionCard proposition={null} viewer={viewer}/>}
+      {viewer.User && <PropositionCard proposition={null} viewer={viewer}/>}
 
       <PropositionList parent={viewer} viewer={viewer} query={relay.variables.query} withParent
                        cardProps={{showType: true}}/>

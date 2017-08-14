@@ -25,9 +25,8 @@ type PageInfo {
   endCursor: String
 }
 
-type Proposition implements Node, PropositionsParent {
+type Proposition implements Node {
   name: String!
-  isGeneral: Boolean!
   published: Boolean!
   sourceURL: String
   text: String!
@@ -35,26 +34,6 @@ type Proposition implements Node, PropositionsParent {
   # The ID of an object
   id: ID!
   language: Language
-  propositions(isGeneral: Boolean, languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionConnection
-  propositionsCount: Int!
-}
-
-# A connection to a list of items.
-type PropositionConnection {
-  # Information to aid in pagination.
-  pageInfo: PageInfo!
-
-  # A list of edges.
-  edges: [PropositionEdge]
-}
-
-# An edge in a connection.
-type PropositionEdge {
-  # The item at the end of the edge
-  node: Proposition
-
-  # A cursor for use in pagination
-  cursor: String!
 }
 
 input PropositionOrder {
@@ -67,10 +46,43 @@ enum PropositionOrderBy {
   VOTES
 }
 
-interface PropositionsParent {
+type PropositionRelation implements Node, PropositionRelationsParent {
+  # The ID of an object
   id: ID!
-  propositions(isGeneral: Boolean, languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionConnection
-  propositionsCount: Int!
+  childCount: Int!
+  children(languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionRelationConnection
+  parent: Proposition!
+  proposition: Proposition!
+  type: PropositionType
+}
+
+# A connection to a list of items.
+type PropositionRelationConnection {
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+
+  # A list of edges.
+  edges: [PropositionRelationEdge]
+}
+
+# An edge in a connection.
+type PropositionRelationEdge {
+  # The item at the end of the edge
+  node: PropositionRelation
+
+  # A cursor for use in pagination
+  cursor: String!
+}
+
+interface PropositionRelationsParent {
+  id: ID!
+  childCount: Int!
+  children(languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionRelationConnection
+}
+
+enum PropositionType {
+  PRO
+  CONTRA
 }
 
 type Query {
@@ -86,10 +98,10 @@ type User {
   id: ID!
 }
 
-type Viewer implements Node, PropositionsParent {
+type Viewer implements Node, PropositionRelationsParent {
   id: ID!
   user: User
-  propositions(isGeneral: Boolean, languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionConnection
-  propositionsCount: Int!
+  childCount: Int!
+  children(languages: [ID], order: PropositionOrder, query: String, after: String, first: Int, before: String, last: Int): PropositionRelationConnection
   languages: [Language]!
 }

@@ -18,7 +18,8 @@ const {
   globalIdField,
   nodeDefinitions
 } = require('graphql-relay')
-const {languages, proposition, user} = require('../entities')
+// const {map} = require('lodash')
+const {languages, Proposition, PropositionRelation, User} = require('../entities')
 const {resolveWithUser} = require('./resolvers')
 
 function fieldsFor(entity, fieldNames) {
@@ -37,13 +38,28 @@ function fieldsFor(entity, fieldNames) {
     .reduce((obj, [k, v]) => (obj[k] = v) && obj, {})
 }
 
+async function viewableBy(propositions, user) {
+  return propositions
+  // function testProposition(proposition) {
+  //   return proposition.published || (user && (user.canPublish || proposition.userId === user.id))
+  // }
+  //
+  // propositions = await Promise.resolve(propositions)
+  // return Array.isArray(propositions)
+  //   ? propositions.filter(testProposition)
+  //   : testProposition(propositions) ? propositions : null
+}
+
+async function findGeneralPropositionRelations(user) {
+  return viewableBy(await PropositionRelation.findAll({parentId: null}), user)
+}
+
 const {nodeInterface, nodeField} = nodeDefinitions(
   resolveWithUser((user, globalId) => {
-    // const {id, type} = fromGlobalId(globalId)
-    const {type} = fromGlobalId(globalId)
+    const {id, type} = fromGlobalId(globalId)
 
     if (type === 'Proposition') {
-      // return Proposition.forUserView(user, {id}).first()
+      return viewableBy(Proposition.find({id}), user)
     }
 
     return {}
@@ -63,27 +79,30 @@ const LanguageGQL = new GraphQLObjectType({
 })
 
 const propositionsArgs = Object.assign({
-  isGeneral: {type: GraphQLBoolean},
   languages: {type: new GraphQLList(GraphQLID)},
-  order: {type: new GraphQLInputObjectType({
-    name: 'PropositionOrder',
-    fields: {
-      by: {type: new GraphQLNonNull(new GraphQLEnumType({
-        name: 'PropositionOrderBy',
-        values: {
-          CREATED_AT: {value: 'createdAt'},
-          VOTES: {value: 'votes_count'}
-        }
-      }))},
-      desc: {type: GraphQLBoolean}
-    }
-  })},
+  order: {
+    type: new GraphQLInputObjectType({
+      name: 'PropositionOrder',
+      fields: {
+        by: {
+          type: new GraphQLNonNull(new GraphQLEnumType({
+            name: 'PropositionOrderBy',
+            values: {
+              CREATED_AT: {value: 'createdAt'},
+              VOTES: {value: 'votes_count'}
+            }
+          }))
+        },
+        desc: {type: GraphQLBoolean}
+      }
+    })
+  },
   query: {type: GraphQLString}
 }, connectionArgs)
 
 const UserGQL = new GraphQLObjectType({
   name: 'User',
-  fields: fieldsFor(user, ['name', 'canPublish', 'canVote'])
+  fields: fieldsFor(User, ['name', 'canPublish', 'canVote'])
   // fields: () => ({
   //   propositions: {
   //     type: PropositionConnection,
@@ -93,15 +112,15 @@ const UserGQL = new GraphQLObjectType({
   // })
 })
 //
-const PropositionsParentGQL = new GraphQLInterfaceType({
-  name: 'PropositionsParent',
+const PropositionRelationsParentGQL = new GraphQLInterfaceType({
+  name: 'PropositionRelationsParent',
   fields: () => ({
     id: {type: new GraphQLNonNull(GraphQLID)},
-    propositions: {
-      type: PropositionConnection,
+    childCount: {type: new GraphQLNonNull(GraphQLInt)},
+    children: {
+      type: PropositionRelationConnection,
       args: propositionsArgs
-    },
-    propositionsCount: {type: new GraphQLNonNull(GraphQLInt)}
+    }
   }),
   resolveType: ({id}) => id === 'viewer' ? ViewerGQL : PropositionGQL
 })
@@ -114,34 +133,43 @@ const PropositionTypeGQL = new GraphQLEnumType({
   }
 })
 
-let PropositionConnection
+let PropositionRelationConnection
 
 const PropositionGQL = new GraphQLObjectType({
   name: 'Proposition',
   fields: () => Object.assign(
-    fieldsFor(proposition, ['name', 'isGeneral', 'published', 'sourceURL', 'text']),
+    fieldsFor(Proposition, ['name', 'published', 'sourceURL', 'text']),
     {
+      // childCount: {
+      //   type: new GraphQLNonNull(GraphQLInt)
+      // },
+      // children: {
+      //   type: PropositionRelationConnection,
+      //   args: propositionsArgs,
+      //   resolve: resolveWithUser(async (user, {id}, args) => connectionFromArray(
+      //     [] ||
+      //     await PropositionRelation.findAll({
+      //       parentId: map(
+      //         await PropositionRelation.findAll({propositionId: id, parentId: null}),
+      //         'id'
+      //       )
+      //     }),
+      //     args
+      //   ))
+      // },
       language: {
         type: LanguageGQL,
         resolve: ({languageId}) => ({id: languageId, name: languages[languageId]})
-      },
-      propositions: {
-        type: PropositionConnection,
-        args: propositionsArgs,
-        resolve: resolveWithUser((user, {id}, args) => (
-          []
-        ))
-      },
-      propositionsCount: {
-        type: new GraphQLNonNull(GraphQLInt),
-        resolve: () => 23
-      }
+      }// ,
+      // parentCount: {
+      //   type: new GraphQLNonNull(GraphQLInt)
+      // },
+      // parentRelations: {
+      //   type: new GraphQLNonNull(new GraphQLList(PropositionRelationGQL))
+      // }
     }
   ),
   // fields: fieldsFor(proposition, ({relationField}) => ({
-  // child_relations: relationField({
-  //   type: new GraphQLNonNull(new GraphQLList(PropositionRelationGQL))
-  // }),
   // child_count: {
   //   type: new GraphQLNonNull(GraphQLInt),
   //   resolve: resolveWithUser(async(user, {id}) => (
@@ -161,33 +189,42 @@ const PropositionGQL = new GraphQLObjectType({
   //   ))
   // }
   // })),
-  interfaces: [nodeInterface, PropositionsParentGQL]
+  interfaces: [nodeInterface]//, PropositionRelationsParentGQL]
 })
 
-// const PropositionRelationGQL = new GraphQLObjectType({
-//   name: 'PropositionRelation',
-//   fields: fieldsFor(PropositionRelation, ({relationField}) => ({
-//     id: globalIdField(),
-//     parent: relationField({type: new GraphQLNonNull(PropositionGQL)}),
-//     child: relationField({type: new GraphQLNonNull(PropositionGQL)}),
-//     type: {type: new GraphQLNonNull(PropositionTypeGQL)}
-//   }))
-// })
+const PropositionRelationGQL = new GraphQLObjectType({
+  name: 'PropositionRelation',
+  fields: () => ({
+    id: globalIdField(),
+    childCount: {
+      type: new GraphQLNonNull(GraphQLInt),
+      resolve: () => 23
+    },
+    children: {
+      type: PropositionRelationConnection,
+      args: propositionsArgs,
+      resolve: resolveWithUser(async (user, {id}, args) => connectionFromArray(
+        await viewableBy(PropositionRelation.findAll({parentId: id}), user),
+        args
+      ))
+    },
+    parent: {type: new GraphQLNonNull(PropositionGQL)},
+    proposition: {
+      type: new GraphQLNonNull(PropositionGQL),
+      resolve: resolveWithUser(
+        (user, {propositionId: id}) => viewableBy(Proposition.find({id}), user)
+      )
+    },
+    type: {type: PropositionTypeGQL}
+  }),
+  interfaces: [nodeInterface, PropositionRelationsParentGQL]
+})
 
-const propositionConnectionDefinition = connectionDefinitions({nodeType: PropositionGQL})
-
-const PropositionEdge = propositionConnectionDefinition.edgeType
-PropositionConnection = propositionConnectionDefinition.connectionType
-
-function viewableBy(propositions, user) {
-  return propositions.filter((proposition) => (
-    proposition.published || (user && (user.canPublish || proposition.userId === user.id))
-  ))
-}
-
-async function findGeneralPropositions(user) {
-  return viewableBy(await proposition.findAll({isGeneral: true}), user)
-}
+const propositionRelationConnectionDefinition = connectionDefinitions({
+  nodeType: PropositionRelationGQL
+})
+const PropositionRelationEdge = propositionRelationConnectionDefinition.edgeType
+PropositionRelationConnection = propositionRelationConnectionDefinition.connectionType
 
 const ViewerGQL = new GraphQLObjectType({
   name: 'Viewer',
@@ -196,14 +233,18 @@ const ViewerGQL = new GraphQLObjectType({
     user: {
       type: UserGQL,
       resolve: (viewer, args, {user_id: id}) => (
-        viewer.user || (id && user.find({id}))
+        viewer.User || (id && User.find({id}))
       )
     },
-    propositions: {
-      type: PropositionConnection,
+    childCount: {
+      type: new GraphQLNonNull(GraphQLInt),
+      resolve: resolveWithUser(async (user) => (await findGeneralPropositionRelations(user)).length)
+    },
+    children: {
+      type: PropositionRelationConnection,
       args: propositionsArgs,
       resolve: resolveWithUser(async (user, viewer, args) => (
-        connectionFromArray(findGeneralPropositions(user), args)
+        connectionFromArray(await findGeneralPropositionRelations(user), args)
       ))
       // .sort((e1, e2) => order.desc ^ (e1[order.by] > e2[order.by]))
       // oldResolve: resolveWithUser((user, viewer, args) => {
@@ -211,10 +252,6 @@ const ViewerGQL = new GraphQLObjectType({
       //     .search(args.query)
       //   return knexToConnection(query, args)
       // })
-    },
-    propositionsCount: {
-      type: new GraphQLNonNull(GraphQLInt),
-      resolve: resolveWithUser(async (user) => findGeneralPropositions(user).length)
     },
     languages: {
       type: new GraphQLNonNull(new GraphQLList(LanguageGQL)),
@@ -224,14 +261,15 @@ const ViewerGQL = new GraphQLObjectType({
       })()
     }
   },
-  interfaces: [nodeInterface, PropositionsParentGQL]
+  interfaces: [nodeInterface, PropositionRelationsParentGQL]
 })
 
 module.exports = {
   nodeField,
-  PropositionEdge,
   PropositionGQL,
-  PropositionsParentGQL,
+  PropositionRelationsParentGQL,
+  PropositionRelationEdge,
+  PropositionRelationGQL,
   PropositionTypeGQL,
   ViewerGQL
 }
