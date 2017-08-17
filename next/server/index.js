@@ -12,7 +12,7 @@ async function startServer() {
   await app.prepare()
   createServer((req, res) => {
     const parsedUrl = parse(req.url, true)
-    const {pathname} = parsedUrl
+    const {pathname, query} = parsedUrl
     if (pathname === '/graphql') {
       graphqlHTTP({
         schema,
@@ -22,6 +22,8 @@ async function startServer() {
           if (dev) return error
         }
       })(req, res)
+    } else if (pathname.startsWith('/search/')) {
+      app.render(req, res, '/', query)
     } else {
       handle(req, res, parsedUrl)
     }
