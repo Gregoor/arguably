@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Arguman",
+    "password_hash": null,
+    "can_vote": false,
+    "can_publish": false
+  },
+  {
+    "id": 2,
+    "name": "Gregor",
+    "password_hash": "$2a$10$BtNwPyQymjBCSKQg9fmWbeC9MMvGLvsneAYZtfNg9E6KkqsEaJiea",
+    "can_vote": true,
+    "can_publish": true
+  },
+  {
+    "id": 3,
+    "name": "max",
+    "password_hash": "$2a$10$xfSLJvAHHAXOCz71e1w7B.LSmSm/vJ6MjXX8W5k9qGNLu12f7Akey",
+    "can_vote": true,
+    "can_publish": true
+  }
+]
