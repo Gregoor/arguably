@@ -1,0 +1,19 @@
+{
+  "presets": [
+    "razzle/babel",
+    "stage-0"
+  ],
+  "plugins": [
+    "lodash",
+    "relay",
+    "inline-react-svg",
+    [
+      "styled-components",
+      {
+        "ssr": true,
+        "displayName": true,
+        "preprocess": false
+      }
+    ]
+  ]
+}
